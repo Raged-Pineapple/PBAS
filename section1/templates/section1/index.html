@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNSIT PBAS Digital Portal - Assistant Professor</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        rnsit: {
+                            blue: '#1d4ed8',
+                            dark: '#1e3a8a',
+                            gold: '#f59e0b',
+                            emerald: '#059669',
+                            slate: '#334155'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .file-upload-input {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-16">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-rnsit-dark text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div
+                    class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-amber-400 font-bold text-xl border border-white/20">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-base sm:text-lg font-bold tracking-tight">RNSIT PBAS Digital Portal</h1>
+                        <span
+                            class="px-2 py-0.5 text-[11px] font-semibold bg-blue-500/30 text-blue-200 border border-blue-400/30 rounded-full">Assistant
+                            Professor</span>
+                    </div>
+                    <p class="text-xs text-slate-300">Annual Appraisal Period: April 2026 – March 2027</p>
+                </div>
+            </div>
+
+            <!-- Sticky Summary Scores Banner -->
+            <div class="flex items-center flex-wrap gap-2 sm:gap-3">
+                <!-- User Profile Pill -->
+                <div class="bg-white/10 border border-white/20 rounded-lg px-2.5 py-1 text-left hidden md:block">
+                    <span class="text-[9px] uppercase tracking-wider text-slate-300 font-semibold block">{{
+                        user_role|default:"FACULTY" }}</span>
+                    <span class="text-xs font-bold text-white">{{ user_name|default:"Dr. Ramesh Kumar" }}</span>
+                </div>
+
+                <!-- Section I -->
+                <div class="bg-white/10 border border-white/20 rounded-lg px-2.5 py-1 text-center">
+                    <span class="text-[10px] uppercase tracking-wider text-slate-300 font-medium block">Sec I</span>
+                    <span class="text-sm font-bold font-mono text-amber-400"><span id="top-sec1-score">0</span><span
+                            class="text-[10px] text-slate-300">/70</span></span>
+                </div>
+                <!-- Section II -->
+                <div class="bg-white/10 border border-white/20 rounded-lg px-2.5 py-1 text-center">
+                    <span class="text-[10px] uppercase tracking-wider text-slate-300 font-medium block">Sec II</span>
+                    <span class="text-sm font-bold font-mono text-cyan-400"><span id="top-sec2-score">0</span><span
+                            class="text-[10px] text-slate-300">/40</span></span>
+                </div>
+                <!-- Section III -->
+                <div class="bg-white/10 border border-white/20 rounded-lg px-2.5 py-1 text-center">
+                    <span class="text-[10px] uppercase tracking-wider text-slate-300 font-medium block">Sec III</span>
+                    <span class="text-sm font-bold font-mono text-purple-400"><span id="top-sec3-score">0</span><span
+                            class="text-[10px] text-slate-300">/20</span></span>
+                </div>
+                <!-- Grand 100-Mark Total -->
+                <div
+                    class="bg-amber-500/20 border border-amber-400/40 rounded-lg px-3 py-1 flex items-center space-x-2">
+                    <div>
+                        <span class="text-[10px] uppercase tracking-wider text-amber-200 font-semibold block">Grand
+                            Total</span>
+                        <div class="text-base font-black font-mono text-amber-400 leading-tight">
+                            <span id="top-grand-total">0</span> <span class="text-xs font-semibold text-amber-200">/
+                                100</span>
+                        </div>
+                    </div>
+                    <span id="top-grade-pill"
+                        class="px-2 py-0.5 text-xs font-bold bg-amber-400 text-slate-900 rounded-md">Draft</span>
+                </div>
+
+                <!-- Global Action Buttons -->
+                <button onclick="calculateCompleteBackend()"
+                    class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold text-xs rounded-lg shadow transition flex items-center space-x-1.5"
+                    title="Calculate all sections via backend">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span class="hidden sm:inline">Calculate</span>
+                </button>
+                <button onclick="saveAllSubmission()"
+                    class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg shadow transition flex items-center space-x-1.5"
+                    title="Save draft to database">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span class="hidden sm:inline">Save</span>
+                </button>
+                <!-- PDF Download Button in Top Bar -->
+                <a href="/export/pdf/" target="_blank"
+                    class="px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center space-x-1.5"
+                    title="Download Official PBAS PDF">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span class="hidden sm:inline">PDF</span>
+                </a>
+                <a href="/api/section1/export/" target="_blank"
+                    class="px-2 py-2 bg-white/10 hover:bg-white/20 text-white text-xs rounded-lg border border-white/20 transition flex items-center space-x-1"
+                    title="Export JSON for PHP/Django API">
+                    <i class="fa-solid fa-code"></i>
+                    <span class="hidden sm:inline">JSON</span>
+                </a>
+                <a href="/logout/"
+                    class="px-2 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs rounded-lg transition"
+                    title="Log Out / Switch Role">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HOD Revision Request / Rejection Notifications Banner -->
+    {% if rejections %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4" id="hod-revision-banner">
+        <div class="bg-gradient-to-r from-rose-500/10 via-rose-50 to-amber-50 border-2 border-rose-400 rounded-2xl p-5 shadow-sm space-y-3">
+            <div class="flex flex-wrap items-center justify-between pb-3 border-b border-rose-200/80 gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h3 class="text-sm font-black text-rose-950">Action Required: Document Revision Requested by HOD</h3>
+                            <span class="px-2.5 py-0.5 bg-rose-600 text-white font-bold text-[10px] rounded-full uppercase tracking-wider animate-pulse">Needs Attention</span>
+                        </div>
+                        <p class="text-xs text-rose-800 mt-0.5">The HOD has reviewed your submission and requested revisions on <b>{{ rejection_count }} document{{ rejection_count|pluralize }}</b>. Please review the feedback below, upload revised evidence, and save your submission.</p>
+                    </div>
+                </div>
+                <span class="px-3 py-1.5 bg-rose-200/80 text-rose-900 font-bold text-xs rounded-xl border border-rose-300">{{ rejection_count }} Revision{{ rejection_count|pluralize }} Requested</span>
+            </div>
+
+            <!-- Individual rejection cards -->
+            <div class="space-y-2.5 pt-1">
+                {% for notif in rejections %}
+                <div class="p-3.5 bg-white border border-rose-200 rounded-xl flex flex-wrap items-start justify-between gap-3 text-xs" id="notif-card-{{ notif.id }}">
+                    <div class="space-y-2 flex-1 min-w-[260px]">
+                        <!-- Document / item name only — no codes -->
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-regular fa-file-lines text-rose-500"></i>
+                            <span class="font-bold text-slate-800 text-xs">{{ notif.component_title }}</span>
+                        </div>
+                        <!-- HOD feedback message -->
+                        <div class="p-2.5 bg-rose-50 border border-rose-200 rounded-lg text-rose-900 leading-relaxed">
+                            <span class="font-semibold text-rose-700 block text-[11px] mb-1 flex items-center gap-1">
+                                <i class="fa-solid fa-comment-dots"></i> HOD's Review Comment:
+                            </span>
+                            {{ notif.message }}
+                        </div>
+                        <!-- Timestamp and reviewer -->
+                        <div class="flex items-center gap-3 text-[11px] text-slate-400">
+                            <span><i class="fa-regular fa-clock"></i> {{ notif.created_at|date:"d M Y, h:i A" }}</span>
+                            <span>•</span>
+                            <span>Reviewed by <b class="text-slate-600">{{ notif.created_by }}</b></span>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button type="button" onclick="dismissFacultyNotification({{ notif.id }})"
+                            class="px-3 py-1.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 border border-slate-200 text-slate-600 rounded-lg font-semibold text-xs transition inline-flex items-center gap-1.5">
+                            <i class="fa-solid fa-check-circle"></i>
+                            <span>Mark as Read</span>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Faculty Details Strip -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+            <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
+                <h2 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-1.5">
+                    <i class="fa-regular fa-id-card text-blue-600"></i>
+                    <span>Faculty & Appraisal Profile</span>
+                </h2>
+                <span class="text-[11px] text-slate-500 font-mono">Status: <span id="portal-status-badge"
+                        class="font-bold text-blue-600">In Progress</span></span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Faculty Name</label>
+                    <input type="text" id="faculty_name" value="{{ user_name }}"
+                        class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 focus:ring-1 focus:ring-blue-500 font-medium">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Employee ID</label>
+                    <input type="text" id="employee_id" value="{{ employee_id }}"
+                        class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 focus:ring-1 focus:ring-blue-500 font-medium">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Department</label>
+                    <input type="text" id="department" value="{{ department }}"
+                        class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 focus:ring-1 focus:ring-blue-500 font-medium">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Academic Year</label>
+                    <select id="academic_year"
+                        class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 focus:ring-1 focus:ring-blue-500 font-medium bg-white">
+                        <option value="2026-2027" selected>2026-2027</option>
+                        <option value="2025-2026">2025-2026</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SECTION TABS NAVIGATION -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div
+            class="flex overflow-x-auto space-x-1 border-b border-slate-200 bg-slate-100 p-1.5 rounded-xl text-xs custom-scrollbar">
+            <button onclick="switchSection('sec-1')" id="nav-btn-sec-1"
+                class="sec-nav-btn px-4 py-2.5 font-bold rounded-lg transition whitespace-nowrap flex items-center space-x-2 bg-blue-600 text-white shadow-sm">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <span>Section I: Teaching Learning (70)</span>
+            </button>
+            <button onclick="switchSection('sec-2')" id="nav-btn-sec-2"
+                class="sec-nav-btn px-4 py-2.5 font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 rounded-lg transition whitespace-nowrap flex items-center space-x-2">
+                <i class="fa-solid fa-flask"></i>
+                <span>Section II: R&D & Consultancy (40)</span>
+            </button>
+            <button onclick="switchSection('sec-3')" id="nav-btn-sec-3"
+                class="sec-nav-btn px-4 py-2.5 font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 rounded-lg transition whitespace-nowrap flex items-center space-x-2">
+                <i class="fa-solid fa-code-branch"></i>
+                <span>Section III: Tech & Professional (20)</span>
+            </button>
+            <button onclick="switchSection('sec-4')" id="nav-btn-sec-4"
+                class="sec-nav-btn px-4 py-2.5 font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 rounded-lg transition whitespace-nowrap flex items-center space-x-2">
+                <i class="fa-solid fa-sitemap"></i>
+                <span>Section IV: Administration (20)</span>
+            </button>
+            <button onclick="switchSection('sec-reviews')" id="nav-btn-sec-reviews"
+                class="sec-nav-btn px-4 py-2.5 font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 rounded-lg transition whitespace-nowrap flex items-center space-x-2">
+                <i class="fa-solid fa-user-check"></i>
+                <span>HOD & Principal Reviews (20)</span>
+            </button>
+            <button onclick="switchSection('sec-summary')" id="nav-btn-sec-summary"
+                class="sec-nav-btn px-4 py-2.5 font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 rounded-lg transition whitespace-nowrap flex items-center space-x-2">
+                <i class="fa-solid fa-award"></i>
+                <span>100-Mark Scale & Summary</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+
+        <!-- ========================================================================= -->
+        <!-- SECTION I: TEACHING LEARNING PROCESS (MAX 70 MARKS) -->
+        <!-- ========================================================================= -->
+        <div id="sec-1" class="section-container space-y-6">
+
+            <!-- Subtab switch for Section 1 -->
+            <div class="flex border-b border-slate-200 space-x-2 text-xs">
+                <button onclick="switchSec1Tab('tab-part1')" id="tab-btn-part1"
+                    class="tab-button px-4 py-2.5 font-bold border-b-2 border-blue-600 text-blue-700 bg-white rounded-t-lg shadow-sm flex items-center space-x-1.5">
+                    <i class="fa-solid fa-chart-pie text-blue-600"></i>
+                    <span>I(i). Course Feedback & Results (Max 50)</span>
+                </button>
+                <button onclick="switchSec1Tab('tab-part2')" id="tab-btn-part2"
+                    class="tab-button px-4 py-2.5 font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-t-lg transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-shapes text-slate-500"></i>
+                    <span>I(ii)–I(x). Other Teaching Learning Components C (Max 20+)</span>
+                </button>
+            </div>
+
+            <!-- PART 1: Course Feedback & Results -->
+            <div id="tab-part1" class="sec1-tab-content space-y-6">
+                <!-- Component A: Feedback -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div
+                        class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span
+                                    class="px-2 py-0.5 text-xs font-bold bg-amber-500 text-slate-900 rounded">Component
+                                    A</span>
+                                <h3 class="text-sm font-bold">Student Feedback (Odd & Even Semesters)</h3>
+                            </div>
+                            <p class="text-[11px] text-slate-300 mt-0.5">Formula: <code
+                                    class="bg-white/10 px-1 py-0.5 rounded text-amber-300 font-mono">min(ceil(((A1 + A2) / 2) * 30 / 100), 30)</code>
+                            </p>
+                        </div>
+                        <div class="bg-white/10 px-3 py-1.5 rounded-lg text-right border border-white/20">
+                            <span class="text-[10px] text-slate-300 uppercase block font-semibold">Marks A</span>
+                            <div class="text-lg font-black text-amber-400 font-mono"><span id="badge-marks-a">0</span> /
+                                30</div>
+                        </div>
+                    </div>
+                    <div class="p-5 space-y-5">
+                        <!-- A1 Odd -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-calendar-week text-blue-600"></i>
+                                    <span>A1. Odd Semester Courses Feedback</span>
+                                </h4>
+                                <button type="button" onclick="addFeedbackRow('odd')"
+                                    class="px-2.5 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded text-xs font-bold border border-blue-200 transition">
+                                    + Add Odd Course
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                                <table class="min-w-full divide-y divide-slate-200 text-xs">
+                                    <thead class="bg-slate-50 font-semibold text-slate-600 uppercase">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left">Course Name / Code</th>
+                                            <th class="px-3 py-2 text-center w-24">Round 1 (%)</th>
+                                            <th class="px-3 py-2 text-center w-24">Round 2 (%)</th>
+                                            <th class="px-3 py-2 text-center w-24">Avg (%)</th>
+                                            <th class="px-3 py-2 text-center w-40">Evidence</th>
+                                            <th class="px-3 py-2 text-center w-12">Del</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="odd-feedback-tbody" class="divide-y divide-slate-200 bg-white"></tbody>
+                                </table>
+                            </div>
+                            <div class="mt-1.5 text-right text-xs text-slate-600">
+                                A1 Average: <span id="label-a1-avg"
+                                    class="font-bold font-mono text-blue-600">0.00%</span>
+                            </div>
+                        </div>
+
+                        <!-- A2 Even -->
+                        <div class="pt-3 border-t border-slate-100">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-calendar-days text-indigo-600"></i>
+                                    <span>A2. Even Semester Courses Feedback</span>
+                                </h4>
+                                <button type="button" onclick="addFeedbackRow('even')"
+                                    class="px-2.5 py-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded text-xs font-bold border border-indigo-200 transition">
+                                    + Add Even Course
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                                <table class="min-w-full divide-y divide-slate-200 text-xs">
+                                    <thead class="bg-slate-50 font-semibold text-slate-600 uppercase">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left">Course Name / Code</th>
+                                            <th class="px-3 py-2 text-center w-24">Round 1 (%)</th>
+                                            <th class="px-3 py-2 text-center w-24">Round 2 (%)</th>
+                                            <th class="px-3 py-2 text-center w-24">Avg (%)</th>
+                                            <th class="px-3 py-2 text-center w-40">Evidence</th>
+                                            <th class="px-3 py-2 text-center w-12">Del</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="even-feedback-tbody" class="divide-y divide-slate-200 bg-white"></tbody>
+                                </table>
+                            </div>
+                            <div class="mt-1.5 text-right text-xs text-slate-600">
+                                A2 Average: <span id="label-a2-avg"
+                                    class="font-bold font-mono text-indigo-600">0.00%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Component B: Results -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div
+                        class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span
+                                    class="px-2 py-0.5 text-xs font-bold bg-emerald-500 text-slate-900 rounded">Component
+                                    B</span>
+                                <h3 class="text-sm font-bold">Final Results (Odd & Even Semesters)</h3>
+                            </div>
+                            <p class="text-[11px] text-slate-300 mt-0.5">Formula: <code
+                                    class="bg-white/10 px-1 py-0.5 rounded text-emerald-300 font-mono">min(ceil(((B1 + B2) / 2) * 20 / 100), 20)</code>
+                            </p>
+                        </div>
+                        <div class="bg-white/10 px-3 py-1.5 rounded-lg text-right border border-white/20">
+                            <span class="text-[10px] text-slate-300 uppercase block font-semibold">Marks B</span>
+                            <div class="text-lg font-black text-emerald-400 font-mono"><span id="badge-marks-b">0</span>
+                                / 20</div>
+                        </div>
+                    </div>
+                    <div class="p-5 space-y-5">
+                        <!-- B1 Odd -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-list-check text-blue-600"></i>
+                                    <span>B1. Odd Semester Final Results</span>
+                                </h4>
+                                <button type="button" onclick="addResultsRow('odd')"
+                                    class="px-2.5 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded text-xs font-bold border border-blue-200 transition">
+                                    + Add Odd Result
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                                <table class="min-w-full divide-y divide-slate-200 text-xs">
+                                    <thead class="bg-slate-50 font-semibold text-slate-600 uppercase">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left">Course Name / Code</th>
+                                            <th class="px-3 py-2 text-center w-24">Appeared</th>
+                                            <th class="px-3 py-2 text-center w-24">Passed</th>
+                                            <th class="px-3 py-2 text-center w-24">Pass %</th>
+                                            <th class="px-3 py-2 text-center w-40">Evidence</th>
+                                            <th class="px-3 py-2 text-center w-12">Del</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="odd-results-tbody" class="divide-y divide-slate-200 bg-white"></tbody>
+                                </table>
+                            </div>
+                            <div class="mt-1.5 text-right text-xs text-slate-600">
+                                B1 Average Pass %: <span id="label-b1-avg"
+                                    class="font-bold font-mono text-blue-600">0.00%</span>
+                            </div>
+                        </div>
+
+                        <!-- B2 Even -->
+                        <div class="pt-3 border-t border-slate-100">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-list-check text-indigo-600"></i>
+                                    <span>B2. Even Semester Final Results</span>
+                                </h4>
+                                <button type="button" onclick="addResultsRow('even')"
+                                    class="px-2.5 py-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded text-xs font-bold border border-indigo-200 transition">
+                                    + Add Even Result
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                                <table class="min-w-full divide-y divide-slate-200 text-xs">
+                                    <thead class="bg-slate-50 font-semibold text-slate-600 uppercase">
+                                        <tr>
+                                            <th class="px-3 py-2 text-left">Course Name / Code</th>
+                                            <th class="px-3 py-2 text-center w-24">Appeared</th>
+                                            <th class="px-3 py-2 text-center w-24">Passed</th>
+                                            <th class="px-3 py-2 text-center w-24">Pass %</th>
+                                            <th class="px-3 py-2 text-center w-40">Evidence</th>
+                                            <th class="px-3 py-2 text-center w-12">Del</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="even-results-tbody" class="divide-y divide-slate-200 bg-white"></tbody>
+                                </table>
+                            </div>
+                            <div class="mt-1.5 text-right text-xs text-slate-600">
+                                B2 Average Pass %: <span id="label-b2-avg"
+                                    class="font-bold font-mono text-indigo-600">0.00%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total A+B Footer -->
+                    <div
+                        class="bg-slate-100 px-5 py-3 border-t border-slate-200 flex items-center justify-between text-xs">
+                        <span class="font-bold text-slate-700">Subtotal Course Feedback + Results (A + B): (Cap
+                            50)</span>
+                        <span id="badge-total-ab"
+                            class="px-3 py-1 bg-blue-600 text-white font-mono font-bold rounded-lg">0 / 50</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PART 2: Other TLP Components C -->
+            <div id="tab-part2" class="sec1-tab-content hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <!-- ii. Own Syllabus -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <span class="font-bold text-slate-800">ii. Own Syllabus for Core Subjects (5/course, max
+                                10)</span>
+                            <span id="score-c-ii"
+                                class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                        </div>
+                        <div id="container-c-ii" class="space-y-2 mb-2"></div>
+                        <button type="button" onclick="addOwnSyllabusRow()"
+                            class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300 transition">+
+                            Add Course Developed</button>
+                    </div>
+
+                    <!-- iii. External Funded Academic Activity -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <span class="font-bold text-slate-800">iii. External Funded Academic Activity (PI:2,
+                                Co-PI:1/₹1L, max 10)</span>
+                            <span id="score-c-iii"
+                                class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                        </div>
+                        <div id="container-c-iii" class="space-y-2 mb-2"></div>
+                        <button type="button" onclick="addFundedActivityRow()"
+                            class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300 transition">+
+                            Add Funded Activity</button>
+                    </div>
+
+                    <!-- iv. Organizing FDP NIRF -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <span class="font-bold text-slate-800">iv. Organizing FDP with NIRF Inst. (10/act, max
+                                10)</span>
+                            <span id="score-c-iv"
+                                class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                        </div>
+                        <div id="container-c-iv" class="space-y-2 mb-2"></div>
+                        <button type="button" onclick="addOrgFdpRow()"
+                            class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300 transition">+
+                            Add Organized FDP</button>
+                    </div>
+
+                    <!-- v. Online Courses Completed -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <span class="font-bold text-slate-800">v. Online Courses Completed (≥30 hrs, 2.5/course, max
+                                10)</span>
+                            <span id="score-c-v"
+                                class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                        </div>
+                        <div id="container-c-v" class="space-y-2 mb-2"></div>
+                        <button type="button" onclick="addOnlineCompletedRow()"
+                            class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300 transition">+
+                            Add Completed Course</button>
+                    </div>
+
+                    <!-- vi. NPTEL Courses Completed -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <span class="font-bold text-slate-800">vi. NPTEL Courses Completed (5 to 10 marks, max
+                                10)</span>
+                            <span id="score-c-vi"
+                                class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                        </div>
+                        <div id="container-c-vi" class="space-y-2 mb-2"></div>
+                        <button type="button" onclick="addNptelRow()"
+                            class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300 transition">+
+                            Add NPTEL Cert</button>
+                    </div>
+
+                    <!-- vii. Online Courses Developed -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <span class="font-bold text-slate-800">vii. Online Courses Developed (Ext: 10, YT: 5, max
+                                10)</span>
+                            <span id="score-c-vii"
+                                class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                        </div>
+                        <div id="container-c-vii" class="space-y-2 mb-2"></div>
+                        <button type="button" onclick="addCourseDevRow()"
+                            class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300 transition">+
+                            Add Developed Course</button>
+                    </div>
+
+                    <!-- viii. Resource Person -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <span class="font-bold text-slate-800">viii. Resource Person (Intern: 5, Prof: 10, max
+                                10)</span>
+                            <span id="score-c-viii"
+                                class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                        </div>
+                        <div id="container-c-viii" class="space-y-2 mb-2"></div>
+                        <button type="button" onclick="addResourcePersonRow()"
+                            class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300 transition">+
+                            Add Resource Person</button>
+                    </div>
+
+                    <!-- ix. AI Tools -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                            <span class="font-bold text-slate-800">ix. Use of AI Tools in TLP (2.5/tool, max 5)</span>
+                            <span id="score-c-ix"
+                                class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 5</span>
+                        </div>
+                        <div id="container-c-ix" class="space-y-2 mb-2"></div>
+                        <button type="button" onclick="addAiToolRow()"
+                            class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300 transition">+
+                            Add AI Tool</button>
+                    </div>
+                </div>
+
+                <!-- x. Innovative Methods -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-100 text-xs">
+                        <div>
+                            <span class="font-bold text-slate-800">x. Innovative Teaching-Learning Methods (2.5/method,
+                                max 10)</span>
+                            <p class="text-slate-500 text-[11px]">Select from the 20 approved methods in PBAS workbook
+                            </p>
+                        </div>
+                        <span id="score-c-x"
+                            class="px-2.5 py-1 bg-purple-100 text-purple-800 font-mono font-bold rounded">0 / 10</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
+                        {% for method in innovative_methods %}
+                        <label
+                            class="flex items-center space-x-2 p-2 rounded border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                            <input type="checkbox" name="innovative_method" value="{{ method }}"
+                                onchange="recalcLocal()" class="w-3.5 h-3.5 text-blue-600 rounded">
+                            <span class="text-slate-700 truncate">{{ method }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation Bar for Section 1 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <span class="text-xs text-slate-500 font-medium">Section I Total: <strong id="foot-sec1-score"
+                        class="font-mono text-blue-700 text-sm">0</strong> / 70 marks</span>
+                <button onclick="switchSection('sec-2')"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition flex items-center space-x-2">
+                    <span>Proceed to Section II: Research & Development</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- SECTION II: RESEARCH & DEVELOPMENT AND CONSULTANCY WORK (MAX 40 MARKS) -->
+        <!-- ========================================================================= -->
+        <div id="sec-2" class="section-container hidden space-y-6">
+            <div
+                class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-5 py-3.5 rounded-xl flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold">Section II – Research & Development and Consultancy Work</h3>
+                    <p class="text-xs text-slate-300">Publications, Grants, Consultancy, IPR, Startups & Ph.D. Guidance
+                        (Maximum 40 marks)</p>
+                </div>
+                <div class="bg-white/10 px-3 py-1.5 rounded-lg text-right border border-white/20">
+                    <span class="text-[10px] text-slate-300 uppercase block font-semibold">Sec II Total</span>
+                    <div class="text-lg font-black text-cyan-400 font-mono"><span id="sec2-score-badge">0</span> / 40
+                    </div>
+                </div>
+            </div>
+
+            <!-- Publications Card (Cap 30) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <div>
+                        <h4 class="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
+                            <i class="fa-solid fa-book-open text-blue-600"></i>
+                            <span>ii. Publications with RNSIT Affiliation (Combined Cap 30)</span>
+                        </h4>
+                        <p class="text-[11px] text-slate-500">Q1 (20/10), Q2 (15/7.5), Q3 (12.5/6.25), Q4/Scopus/WoS
+                            (10/5), Indexed Conf (5/2.5)</p>
+                    </div>
+                    <div class="text-right">
+                        <span id="score-sec2-pub"
+                            class="px-2.5 py-1 bg-cyan-100 text-cyan-800 font-mono font-bold text-xs rounded">0 /
+                            30</span>
+                    </div>
+                </div>
+                <div id="container-sec2-pub" class="space-y-2"></div>
+                <button type="button" onclick="addPubRow()"
+                    class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded border border-slate-300 transition flex items-center space-x-1">
+                    <i class="fa-solid fa-plus text-slate-500"></i>
+                    <span>+ Add Journal / Conference Publication</span>
+                </button>
+            </div>
+
+            <!-- Grid of Other R&D Components -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <!-- i. Invited Talk -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">i. Invited Talk / Keynote (2.5/act, cap 5)</span>
+                        <span id="score-sec2-talk"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 5</span>
+                    </div>
+                    <div id="container-sec2-talk" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addTalkRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Invited Talk</button>
+                </div>
+
+                <!-- iii. Books / Chapters -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">iii. Books / Chapters with RNSIT (2.5/item, cap 5)</span>
+                        <span id="score-sec2-book"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 5</span>
+                    </div>
+                    <div id="container-sec2-book" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addBookRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Book / Chapter</button>
+                </div>
+
+                <!-- iv. Research Proposals Submitted -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">iv. Research Proposals Submitted (5/proposal, cap
+                            5)</span>
+                        <span id="score-sec2-proposal"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 5</span>
+                    </div>
+                    <div id="container-sec2-proposal" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addProposalRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Research Proposal</button>
+                </div>
+
+                <!-- v. Funded Projects -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">v. Research Funded Projects (PI 100%, Co-PI 60%, cap
+                            20)</span>
+                        <span id="score-sec2-project"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 20</span>
+                    </div>
+                    <div id="container-sec2-project" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addResearchProjectRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Funded Project</button>
+                </div>
+
+                <!-- vi. Consultancy Projects -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">vi. Consultancy Projects (≤5L: 5, >5L: 10, cap 10)</span>
+                        <span id="score-sec2-consult"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                    </div>
+                    <div id="container-sec2-consult" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addConsultancyRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Consultancy Project</button>
+                </div>
+
+                <!-- vii. IPR & Patents -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">vii. IPR & Patents (Granted: 10, Pub: 5, cap 10)</span>
+                        <span id="score-sec2-patent"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                    </div>
+                    <div id="container-sec2-patent" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addPatentRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Patent</button>
+                </div>
+
+                <!-- viii. Ph.D. Guidance -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">viii. Ph.D. Guidance / Awarded (cap 10)</span>
+                        <span id="score-sec2-phd"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                    </div>
+                    <div id="container-sec2-phd" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addPhdRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Scholar Record</button>
+                </div>
+
+                <!-- ix. Industry Immersion -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">ix. Faculty Industry Immersion (min 4 wks, 2.5/wk, cap
+                            10)</span>
+                        <span id="score-sec2-immersion"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                    </div>
+                    <div id="container-sec2-immersion" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addImmersionRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Immersion</button>
+                </div>
+
+                <!-- x. Mentoring Startups -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">x. Mentoring Student Startups (10/startup, cap 10)</span>
+                        <span id="score-sec2-startup"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                    </div>
+                    <div id="container-sec2-startup" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addStartupRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Mentored Startup</button>
+                </div>
+
+                <!-- xi. Member of SIG -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">xi. Active Member of RNSIT SIG (5/activity, cap 5)</span>
+                        <span id="score-sec2-sig"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 5</span>
+                    </div>
+                    <div id="container-sec2-sig" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addSigRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add SIG Activity</button>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation Bar for Section 2 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <button onclick="switchSection('sec-1')"
+                    class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Section I</span>
+                </button>
+                <span class="text-xs text-slate-500 font-medium">Section II Score: <strong id="foot-sec2-score"
+                        class="font-mono text-cyan-700 text-sm">0</strong> / 40</span>
+                <button onclick="switchSection('sec-3')"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition flex items-center space-x-1.5">
+                    <span>Proceed to Section III: Technical & Professional</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- SECTION III: TECHNICAL & PROFESSIONAL ACTIVITIES (MAX 20 MARKS) -->
+        <!-- ========================================================================= -->
+        <div id="sec-3" class="section-container hidden space-y-6">
+            <div
+                class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-5 py-3.5 rounded-xl flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold">Section III – Technical & Professional Activities</h3>
+                    <p class="text-xs text-slate-300">Certifications, Memberships, Hackathons & Student Initiatives
+                        (Maximum 20 marks)</p>
+                </div>
+                <div class="bg-white/10 px-3 py-1.5 rounded-lg text-right border border-white/20">
+                    <span class="text-[10px] text-slate-300 uppercase block font-semibold">Sec III Total</span>
+                    <div class="text-lg font-black text-purple-400 font-mono"><span id="sec3-score-badge">0</span> / 20
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <!-- i. FDP Attended Outside -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">i. FDP / Workshop Attended Outside (State: 0.5, Nat:
+                            1/day, cap 5)</span>
+                        <span id="score-sec3-fdp"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 5</span>
+                    </div>
+                    <div id="container-sec3-fdp" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addFdpAttRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add FDP Attended</button>
+                </div>
+
+                <!-- ii. Professional Society Membership -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">ii. Professional Society Membership (2.5 marks, cap
+                            2.5)</span>
+                        <span id="score-sec3-mem"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 2.5</span>
+                    </div>
+                    <div id="container-sec3-mem" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addMembershipRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Society Membership</button>
+                </div>
+
+                <!-- iii. Coordinator COE / Lab -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">iii. Coordinator COE, R&D Lab or Collab (5 marks, cap
+                            5)</span>
+                        <span id="score-sec3-coe"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 5</span>
+                    </div>
+                    <div id="container-sec3-coe" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addCoeRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Lab / COE Responsibility</button>
+                </div>
+
+                <!-- iv. Industry Certification -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">iv. Global / Industry Certification (10 marks, cap
+                            10)</span>
+                        <span id="score-sec3-cert"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                    </div>
+                    <div id="container-sec3-cert" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addCertRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Global Certification</button>
+                </div>
+
+                <!-- v. Conf / FDP Organized -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">v. Conf (5) / FDP (1/day) Organized (cap 5)</span>
+                        <span id="score-sec3-org"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 5</span>
+                    </div>
+                    <div id="container-sec3-org" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addOrgEventRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Event Organized</button>
+                </div>
+
+                <!-- vi. KSCST/IEI Project Guidance -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">vi. KSCST/IEI Funded Student Project (2.5 marks, cap
+                            2.5)</span>
+                        <span id="score-sec3-kscst"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 2.5</span>
+                    </div>
+                    <div id="container-sec3-kscst" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addKscstRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add KSCST/IEI Guidance</button>
+                </div>
+
+                <!-- vii. Seed Grant / RA -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">vii. RNSIT Seed Grant / RA (7.5 marks, cap 7.5)</span>
+                        <span id="score-sec3-seed"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 7.5</span>
+                    </div>
+                    <div id="container-sec3-seed" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addSeedGrantRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Seed Grant / RA</button>
+                </div>
+
+                <!-- viii. URF/PRF -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">viii. RNSIT URF/PRF Funded Project (5 marks, cap
+                            5)</span>
+                        <span id="score-sec3-urf"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 5</span>
+                    </div>
+                    <div id="container-sec3-urf" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addUrfRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add URF/PRF Project</button>
+                </div>
+
+                <!-- ix. Student Conf Paper -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">ix. Student Conf Paper Presentation (5/paper, cap
+                            10)</span>
+                        <span id="score-sec3-studpub"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                    </div>
+                    <div id="container-sec3-studpub" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addStudentPubRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Student Paper</button>
+                </div>
+
+                <!-- x. Hackathons -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">x. Mentoring/Winning Hackathons (State: 2, Nat: 3, cap
+                            5)</span>
+                        <span id="score-sec3-hackathon"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 5</span>
+                    </div>
+                    <div id="container-sec3-hackathon" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addHackathonRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Hackathon Record</button>
+                </div>
+
+                <!-- xi. Automation Software -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:col-span-2">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">xi. Automation Software Development & Deployment by
+                            Interns (10 marks, cap 10)</span>
+                        <span id="score-sec3-auto"
+                            class="px-2 py-0.5 bg-blue-100 text-blue-800 font-mono font-bold rounded">0 / 10</span>
+                    </div>
+                    <div id="container-sec3-auto" class="space-y-2 mb-2"></div>
+                    <button type="button" onclick="addAutomationRow()"
+                        class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded border border-slate-300">+
+                        Add Deployed Automation Software</button>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation Bar for Section 3 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <button onclick="switchSection('sec-2')"
+                    class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Section II</span>
+                </button>
+                <span class="text-xs text-slate-500 font-medium">Section III Score: <strong id="foot-sec3-score"
+                        class="font-mono text-purple-700 text-sm">0</strong> / 20</span>
+                <button onclick="switchSection('sec-4')"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition flex items-center space-x-1.5">
+                    <span>Proceed to Section IV: Administration</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- SECTION IV: ACADEMIC ADMINISTRATION ACTIVITIES (MAX 20 MARKS) -->
+        <!-- ========================================================================= -->
+        <div id="sec-4" class="section-container hidden space-y-6">
+            <div
+                class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-5 py-3.5 rounded-xl flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold">Section IV – Academic Administration Activities</h3>
+                    <p class="text-xs text-slate-300">Departmental Responsibilities & Significant Contributions (10
+                        lines, Maximum 20 marks)</p>
+                </div>
+                <div class="bg-white/10 px-3 py-1.5 rounded-lg text-right border border-white/20">
+                    <span class="text-[10px] text-slate-300 uppercase block font-semibold">Awarded Score</span>
+                    <div class="text-lg font-black text-amber-400 font-mono"><span id="sec4-score-badge">0</span> / 20
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 text-xs">
+                    <div>
+                        <h4 class="font-bold text-slate-800">Departmental Responsibilities (List up to 10 significant
+                            contributions)</h4>
+                        <p class="text-slate-500 text-[11px]">Record committee/role, scope, specific contribution,
+                            measurable outcome and upload evidence.</p>
+                    </div>
+                    <button type="button" onclick="addResponsibilityRow()"
+                        class="px-3 py-1.5 bg-blue-50 text-blue-600 font-bold border border-blue-200 rounded hover:bg-blue-100 transition">
+                        + Add Responsibility
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                    <table class="min-w-full divide-y divide-slate-200 text-xs">
+                        <thead class="bg-slate-50 font-semibold text-slate-600 uppercase">
+                            <tr>
+                                <th class="px-3 py-2 text-left w-12">#</th>
+                                <th class="px-3 py-2 text-left">Committee / Role</th>
+                                <th class="px-3 py-2 text-left">Contribution & Measurable Outcome</th>
+                                <th class="px-3 py-2 text-center w-36">Evidence</th>
+                                <th class="px-3 py-2 text-center w-12">Del</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sec4-tbody" class="divide-y divide-slate-200 bg-white"></tbody>
+                    </table>
+                </div>
+
+                <!-- Marks Input by Reviewer -->
+                <div
+                    class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div>
+                        <span class="font-bold text-slate-800">Marks Awarded for Section IV (by HOD / Principal):</span>
+                        <p class="text-slate-500 text-[11px]">Evaluated based on documentation and contribution level
+                            (Max 20 marks)</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="number" id="sec4-marks-input" min="0" max="20" value="16" oninput="recalcLocal()"
+                            class="w-20 px-3 py-1.5 border border-slate-300 rounded font-mono font-bold text-center">
+                        <span class="text-slate-500 font-semibold">/ 20</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation Bar for Section 4 -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <button onclick="switchSection('sec-3')"
+                    class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Section III</span>
+                </button>
+                <button onclick="switchSection('sec-reviews')"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition flex items-center space-x-1.5">
+                    <span>Proceed to HOD & Principal Reviews</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- HOD & PRINCIPAL REVIEWS (MAX 15 + 5 MARKS) -->
+        <!-- ========================================================================= -->
+        <div id="sec-reviews" class="section-container hidden space-y-6">
+            <div
+                class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-5 py-3.5 rounded-xl flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold">HOD & Principal Evaluation Rubric</h3>
+                    <p class="text-xs text-slate-300">Department Review (15 marks) + Institutional Development Review (5
+                        marks)</p>
+                </div>
+                <div class="bg-white/10 px-3 py-1.5 rounded-lg text-right border border-white/20">
+                    <span class="text-[10px] text-slate-300 uppercase block font-semibold">Review Total</span>
+                    <div class="text-lg font-black text-amber-400 font-mono"><span id="reviews-total-badge">20</span> /
+                        20</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                <!-- HOD Evaluation (15 marks) -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <h4 class="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
+                            <i class="fa-solid fa-user-tie text-blue-600"></i>
+                            <span>HOD Evaluation (Maximum 15 marks)</span>
+                        </h4>
+                        <span id="score-hod-total"
+                            class="px-2.5 py-1 bg-blue-100 text-blue-800 font-mono font-bold rounded">15 / 15</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                            <span class="text-slate-700">1. Discipline / Regularity / Attitude (0-3)</span>
+                            <input type="number" id="hod_c1" min="0" max="3" step="0.5" value="3"
+                                oninput="recalcLocal()"
+                                class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold">
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                            <span class="text-slate-700">2. Academic Planning & Quality (0-3)</span>
+                            <input type="number" id="hod_c2" min="0" max="3" step="0.5" value="3"
+                                oninput="recalcLocal()"
+                                class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold">
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                            <span class="text-slate-700">3. Dept Admin Support (0-3)</span>
+                            <input type="number" id="hod_c3" min="0" max="3" step="0.5" value="3"
+                                oninput="recalcLocal()"
+                                class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold">
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                            <span class="text-slate-700">4. NBA, NAAC, NIRF, FDP Coord (0-3)</span>
+                            <input type="number" id="hod_c4" min="0" max="3" step="0.5" value="3"
+                                oninput="recalcLocal()"
+                                class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold">
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                            <span class="text-slate-700">5. Autonomous Activities Support (0-3)</span>
+                            <input type="number" id="hod_c5" min="0" max="3" step="0.5" value="3"
+                                oninput="recalcLocal()"
+                                class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">HOD Remarks &
+                            Recommendations</label>
+                        <textarea id="hod_remarks" rows="2"
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-1 focus:ring-blue-500"
+                            placeholder="Enter HOD remarks..."></textarea>
+                    </div>
+                    <div class="flex items-center space-x-2 pt-1">
+                        <input type="checkbox" id="hod_increment" checked class="w-4 h-4 text-emerald-600 rounded">
+                        <label for="hod_increment" class="text-slate-700 font-semibold">Annual Increment
+                            Recommended</label>
+                    </div>
+                </div>
+
+                <!-- Principal Evaluation (5 marks) -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <h4 class="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
+                            <i class="fa-solid fa-building-columns text-indigo-600"></i>
+                            <span>Principal Evaluation (Maximum 5 marks)</span>
+                        </h4>
+                        <span id="score-principal-total"
+                            class="px-2.5 py-1 bg-indigo-100 text-indigo-800 font-mono font-bold rounded">5 / 5</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                            <span class="text-slate-700">1. Vision & Goal Setting (0-1)</span>
+                            <input type="number" id="p_c1" min="0" max="1" step="0.5" value="1" oninput="recalcLocal()"
+                                class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold">
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                            <span class="text-slate-700">2. Leadership & Management (0-1)</span>
+                            <input type="number" id="p_c2" min="0" max="1" step="0.5" value="1" oninput="recalcLocal()"
+                                class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold">
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                            <span class="text-slate-700">3. Involvement in Academic Admin (0-1)</span>
+                            <input type="number" id="p_c3" min="0" max="1" step="0.5" value="1" oninput="recalcLocal()"
+                                class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold">
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                            <span class="text-slate-700">4. Research & Innovation (0-1)</span>
+                            <input type="number" id="p_c4" min="0" max="1" step="0.5" value="1" oninput="recalcLocal()"
+                                class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold">
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded bg-slate-50 border border-slate-200">
+                            <span class="text-slate-700">5. Overall Discipline (0-1)</span>
+                            <input type="number" id="p_c5" min="0" max="1" step="0.5" value="1" oninput="recalcLocal()"
+                                class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Principal Remarks &
+                            Decisions</label>
+                        <textarea id="principal_remarks" rows="2"
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-1 focus:ring-blue-500"
+                            placeholder="Enter Principal remarks..."></textarea>
+                    </div>
+                    <div class="flex items-center space-x-2 pt-1">
+                        <input type="checkbox" id="principal_increment" checked
+                            class="w-4 h-4 text-emerald-600 rounded">
+                        <label for="principal_increment" class="text-slate-700 font-semibold">Annual Increment
+                            Approved</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation Bar for Reviews -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <button onclick="switchSection('sec-4')"
+                    class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Section IV</span>
+                </button>
+                <button onclick="switchSection('sec-summary')"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition flex items-center space-x-1.5">
+                    <span>View Grand Summary & 100-Mark Scale</span>
+                    <i class="fa-solid fa-award"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- OVERALL SUMMARY: 100-MARK SCALE & GRADE -->
+        <!-- ========================================================================= -->
+        <div id="sec-summary" class="section-container hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-4 gap-3">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Final PBAS Performance Scorecard (100-Mark Scale)
+                        </h3>
+                        <p class="text-xs text-slate-500">Official RNSIT Assistant Professor Appraisal Grading Metric
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="calculateCompleteBackend()"
+                            class="px-3.5 py-2 bg-blue-600 text-white font-semibold text-xs rounded-lg hover:bg-blue-700 transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                            <span>Re-calculate All</span>
+                        </button>
+                        <button onclick="saveAllSubmission()"
+                            class="px-3.5 py-2 bg-emerald-600 text-white font-semibold text-xs rounded-lg hover:bg-emerald-700 transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Save & Submit to HOD</span>
+                        </button>
+                        <!-- Big Download as PDF Button -->
+                        <a href="/export/pdf/" target="_blank"
+                            class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-lg shadow transition flex items-center space-x-2">
+                            <i class="fa-solid fa-file-pdf text-sm"></i>
+                            <span>Download as PDF</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4 KPI Breakdown Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                    <!-- Sec I -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <span class="font-bold text-blue-700 uppercase tracking-wider block">Section I</span>
+                        <span class="text-xs text-blue-600">Teaching Learning Process</span>
+                        <div class="text-2xl font-black font-mono text-blue-900 mt-2"><span id="sum-sec1">0</span> <span
+                                class="text-xs font-semibold text-blue-600">/ 70</span></div>
+                    </div>
+                    <!-- Sec II -->
+                    <div class="bg-cyan-50 border border-cyan-200 rounded-xl p-4">
+                        <span class="font-bold text-cyan-700 uppercase tracking-wider block">Section II</span>
+                        <span class="text-xs text-cyan-600">R&D & Consultancy</span>
+                        <div class="text-2xl font-black font-mono text-cyan-900 mt-2"><span id="sum-sec2">0</span> <span
+                                class="text-xs font-semibold text-cyan-600">/ 40</span></div>
+                    </div>
+                    <!-- Sec III -->
+                    <div class="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                        <span class="font-bold text-purple-700 uppercase tracking-wider block">Section III</span>
+                        <span class="text-xs text-purple-600">Technical & Professional</span>
+                        <div class="text-2xl font-black font-mono text-purple-900 mt-2"><span id="sum-sec3">0</span>
+                            <span class="text-xs font-semibold text-purple-600">/ 20</span>
+                        </div>
+                    </div>
+                    <!-- Scaled Score -->
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                        <span class="font-bold text-amber-700 uppercase tracking-wider block">Scaled Score (80)</span>
+                        <span class="text-xs text-amber-600">(Subtotal / 130) × 80</span>
+                        <div class="text-2xl font-black font-mono text-amber-900 mt-2"><span
+                                id="sum-scaled80">0.0</span> <span class="text-xs font-semibold text-amber-600">/
+                                80</span></div>
+                    </div>
+                </div>
+
+                <!-- Grand Total & Grade Block -->
+                <div
+                    class="bg-gradient-to-r from-slate-900 to-navy-900 text-white rounded-xl p-6 flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Total Appraisal
+                            Score</span>
+                        <h4 class="text-2xl font-black mt-0.5">Grand Performance Evaluation</h4>
+                        <p class="text-xs text-slate-300 mt-1 font-mono">Formula: Scaled Score (80) + HOD Evaluation
+                            (15) + Principal Evaluation (5)</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-white/10 px-6 py-3 rounded-xl border border-white/20 text-center">
+                            <span class="text-[10px] uppercase text-slate-300 font-semibold block">Performance
+                                Score</span>
+                            <div class="text-4xl font-black text-amber-400 font-mono tracking-tight"><span
+                                    id="sum-grand-total">0.0</span> <span class="text-sm text-slate-300 font-bold">/
+                                    100</span></div>
+                        </div>
+                        <div class="bg-white/10 px-5 py-3 rounded-xl border border-white/20 text-center">
+                            <span class="text-[10px] uppercase text-slate-300 font-semibold block">Grade Awarded</span>
+                            <div id="sum-grade-text" class="text-2xl font-black text-emerald-400 mt-1">Excellent</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Official Grade Scale Table -->
+                <div class="overflow-x-auto border border-slate-200 rounded-xl text-xs">
+                    <table class="min-w-full divide-y divide-slate-200">
+                        <thead class="bg-slate-50 font-bold text-slate-700 uppercase">
+                            <tr>
+                                <th class="px-4 py-2.5 text-left">Grade Band</th>
+                                <th class="px-4 py-2.5 text-center">Score Range (out of 100)</th>
+                                <th class="px-4 py-2.5 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 bg-white">
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-4 py-2 font-bold text-emerald-700">Excellent</td>
+                                <td class="px-4 py-2 text-center font-mono">91 – 100</td>
+                                <td class="px-4 py-2 text-center text-emerald-600 font-semibold">Annual Increment &
+                                    Merit</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-4 py-2 font-bold text-blue-700">Very Good</td>
+                                <td class="px-4 py-2 text-center font-mono">81 – 90</td>
+                                <td class="px-4 py-2 text-center text-blue-600 font-semibold">Annual Increment
+                                    Recommended</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-4 py-2 font-bold text-indigo-700">Good</td>
+                                <td class="px-4 py-2 text-center font-mono">71 – 80</td>
+                                <td class="px-4 py-2 text-center text-indigo-600 font-semibold">Increment Recommended
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-4 py-2 font-bold text-amber-700">Average</td>
+                                <td class="px-4 py-2 text-center font-mono">61 – 70</td>
+                                <td class="px-4 py-2 text-center text-amber-600 font-semibold">Improvement Needed</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-4 py-2 font-bold text-rose-700">Not Satisfactory</td>
+                                <td class="px-4 py-2 text-center font-mono">60 and below</td>
+                                <td class="px-4 py-2 text-center text-rose-600 font-semibold">Under Review</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Upload Evidence Modal -->
+    <div id="upload-modal"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2">
+                    <i class="fa-solid fa-file-arrow-up text-blue-600"></i>
+                    <span>Upload Documentary Evidence</span>
+                </h3>
+                <button onclick="closeUploadModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div>
+                <p class="text-xs text-slate-500 mb-3" id="modal-component-desc">Attach supporting document (PDF, PNG,
+                    JPG, DOCX). Stored in PBAS media directory.</p>
+                <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-blue-500 transition cursor-pointer"
+                    onclick="document.getElementById('modal-file-input').click()">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 mb-2"></i>
+                    <p class="text-xs font-medium text-slate-700">Click to browse or drag file here</p>
+                    <p class="text-[10px] text-slate-400 mt-1">PDF, DOCX, JPG, PNG up to 10MB</p>
+                    <input type="file" id="modal-file-input" class="file-upload-input"
+                        onchange="handleModalFileSelected(this)">
+                </div>
+                <div id="modal-selected-filename" class="text-xs font-mono text-blue-600 font-semibold mt-2 truncate">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="closeUploadModal()"
+                    class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">Cancel</button>
+                <button id="modal-upload-btn" onclick="executeUpload()"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-upload"></i>
+                    <span>Confirm Upload</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"
+        class="fixed bottom-6 right-6 z-50 hidden bg-slate-900 text-white px-5 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center space-x-3 text-sm">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg">Notification</span>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        window.SERVER_SUBMISSION = {% if submission_json %}{ { submission_json | safe } } {% else %} null{% endif %};
+
+        function dismissFacultyNotification(notifId) {
+            fetch(`/api/notifications/${notifId}/dismiss/`, { method: 'POST' })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        const el = document.getElementById('notif-card-' + notifId);
+                        if (el) el.remove();
+                        const remaining = document.querySelectorAll('[id^="notif-card-"]');
+                        if (remaining.length === 0) {
+                            const banner = document.getElementById('hod-revision-banner');
+                            if (banner) banner.remove();
+                        }
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+    </script>
+    <script src="/static/js/pbas_all_sections.js"></script>
+</body>
+
+</html>

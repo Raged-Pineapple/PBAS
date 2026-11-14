@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOD Evaluation & Evidence Verification - {{ submission.faculty_name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a' },
+                        rnsit: { blue: '#1d4ed8', dark: '#1e3a8a', gold: '#f59e0b' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-16">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-rnsit-dark text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <a href="/hod/" class="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition" title="Back to HOD Portal">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-base font-bold">HOD Faculty Appraisal Verification</h1>
+                        <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-400 text-slate-900 rounded-full">Review Mode</span>
+                    </div>
+                    <p class="text-xs text-slate-300">Evaluating: <b>{{ submission.faculty_name }}</b> (ID: {{ submission.employee_id|default:"N/A" }})</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <a href="/export/pdf/{{ submission.id }}/" target="_blank" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>Download PDF</span>
+                </a>
+                <a href="/hod/" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-lg transition">Back to List</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Faculty Header Banner -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <div class="flex flex-wrap items-center justify-between border-b border-slate-100 pb-4 gap-3">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-600 font-mono">{{ submission.department }}</span>
+                    <h2 class="text-xl font-black text-slate-800">{{ submission.faculty_name }}</h2>
+                    <p class="text-xs text-slate-500">Employee ID: <span class="font-mono font-semibold">{{ submission.employee_id|default:"N/A" }}</span> | Appraisal Year: {{ submission.academic_year }}</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-2 text-center">
+                        <span class="text-[10px] uppercase tracking-wider text-blue-700 font-semibold block">Claimed Subtotal</span>
+                        <span class="text-xl font-black font-mono text-blue-900">{{ submission.subtotal_130 }} <span class="text-xs text-blue-600 font-normal">/ 130</span></span>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2 text-center">
+                        <span class="text-[10px] uppercase tracking-wider text-amber-800 font-semibold block">Scaled Score</span>
+                        <span class="text-xl font-black font-mono text-amber-900">{{ submission.scaled_80 }} <span class="text-xs text-amber-700 font-normal">/ 80</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-slate-500 block">Sec I: Teaching Learning</span>
+                    <span class="text-base font-mono font-bold text-blue-700">{{ submission.section1_final_score }} / 70</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-slate-500 block">Sec II: R&D & Consultancy</span>
+                    <span class="text-base font-mono font-bold text-cyan-700">{{ submission.section2_final_score }} / 40</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-slate-500 block">Sec III: Tech & Professional</span>
+                    <span class="text-base font-mono font-bold text-purple-700">{{ submission.section3_final_score }} / 20</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-slate-500 block">Current Status</span>
+                    <span class="text-sm font-bold text-emerald-700">{{ submission.status }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Tabs to Review Data & Uploaded Proofs -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="flex overflow-x-auto border-b border-slate-200 bg-slate-100 p-2 text-xs space-x-1.5 custom-scrollbar">
+                <button onclick="switchHODTab('hod-tab-sec1')" id="btn-hod-tab-sec1" class="hod-tab-btn px-4 py-2 font-bold rounded-lg transition bg-blue-600 text-white shadow-sm flex items-center space-x-1.5">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span>Sec I: Teaching Learning ({{ submission.section1_final_score }}/70)</span>
+                </button>
+                <button onclick="switchHODTab('hod-tab-sec2')" id="btn-hod-tab-sec2" class="hod-tab-btn px-4 py-2 font-semibold text-slate-600 hover:text-slate-900 rounded-lg transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-flask"></i>
+                    <span>Sec II: R&D & Consultancy ({{ submission.section2_final_score }}/40)</span>
+                </button>
+                <button onclick="switchHODTab('hod-tab-sec3')" id="btn-hod-tab-sec3" class="hod-tab-btn px-4 py-2 font-semibold text-slate-600 hover:text-slate-900 rounded-lg transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-code-branch"></i>
+                    <span>Sec III: Tech & Professional ({{ submission.section3_final_score }}/20)</span>
+                </button>
+                <button onclick="switchHODTab('hod-tab-sec4')" id="btn-hod-tab-sec4" class="hod-tab-btn px-4 py-2 font-semibold text-slate-600 hover:text-slate-900 rounded-lg transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-sitemap"></i>
+                    <span>Sec IV: Departmental Responsibilities</span>
+                </button>
+                <button onclick="switchHODTab('hod-tab-docs')" id="btn-hod-tab-docs" class="hod-tab-btn px-4 py-2 font-semibold text-slate-600 hover:text-slate-900 rounded-lg transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-paperclip text-rose-500"></i>
+                    <span>All Uploaded Proofs ({{ evidence_docs|length }})</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: SECTION I DETAILS & PROOFS -->
+            <div id="hod-tab-sec1" class="hod-tab-content p-6 space-y-6">
+                <!-- A: Student Feedback -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <h4 class="text-sm font-bold text-slate-800 flex items-center space-x-2">
+                            <span class="px-2 py-0.5 text-xs bg-amber-500 text-slate-900 rounded font-bold">Component A</span>
+                            <span>Student Feedback Records (Max 30)</span>
+                        </h4>
+                        <span class="text-xs font-mono font-bold text-blue-700">Verified A Marks: {{ breakdown.feedback_a.marks_awarded|default:"0" }} / 30</span>
+                    </div>
+
+                    <!-- Odd Semester Feedback -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
+                        <div class="bg-slate-50 px-4 py-2 font-bold text-slate-700">Odd Semester Courses Feedback</div>
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50 text-[11px] text-slate-500 uppercase">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Course Title</th>
+                                    <th class="px-3 py-2 text-center">Round 1 (%)</th>
+                                    <th class="px-3 py-2 text-center">Round 2 (%)</th>
+                                    <th class="px-3 py-2 text-center">Course Avg (%)</th>
+                                    <th class="px-4 py-2 text-center">Attached Proof</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white">
+                                {% for c in breakdown.feedback_a.a1_details %}
+                                <tr>
+                                    <td class="px-4 py-2.5 font-medium text-slate-800">{{ c.course_name }}</td>
+                                    <td class="px-3 py-2.5 text-center font-mono">{{ c.round_1|default:"-" }}%</td>
+                                    <td class="px-3 py-2.5 text-center font-mono">{{ c.round_2|default:"-" }}%</td>
+                                    <td class="px-3 py-2.5 text-center font-mono font-bold text-blue-600">{{ c.average }}%</td>
+                                    <td class="px-4 py-2.5 text-center">
+                                        {% if c.evidence_file %}
+                                        <div class="inline-flex items-center gap-1.5 justify-center flex-wrap">
+                                            <button type="button" onclick="openPreviewModal('inline_fb_odd_{{ forloop.counter }}', '{{ c.course_name|escapejs }} – Feedback Report', '{{ c.evidence_file }}')" class="px-2.5 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-eye"></i>
+                                                <span>Preview</span>
+                                            </button>
+                                            <button type="button" onclick="toggleInlineVerify(this, 'fb_odd_{{ forloop.counter }}')" data-verify-key="fb_odd_{{ forloop.counter }}" data-verified="false" class="inline-verify-btn px-2.5 py-1 bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 border border-slate-300 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                                <span>Verify</span>
+                                            </button>
+                                            <button type="button" onclick="openRejectDialog('inline_fb_odd_{{ forloop.counter }}', '{{ c.course_name|escapejs }} – Feedback Report', 'SEC1_A1', '{{ c.evidence_file }}')" class="inline-reject-btn px-2.5 py-1 bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-circle-xmark"></i>
+                                                <span>Reject</span>
+                                            </button>
+                                        </div>
+                                        <div id="status-fb_odd_{{ forloop.counter }}" class="hidden mt-1 text-[10px] text-rose-600 font-medium"></div>
+                                        {% else %}
+                                        <span class="text-slate-400 italic">No file attached</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="px-4 py-3 text-center text-slate-400">No odd semester courses recorded.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Even Semester Feedback -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
+                        <div class="bg-slate-50 px-4 py-2 font-bold text-slate-700">Even Semester Courses Feedback</div>
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50 text-[11px] text-slate-500 uppercase">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Course Title</th>
+                                    <th class="px-3 py-2 text-center">Round 1 (%)</th>
+                                    <th class="px-3 py-2 text-center">Round 2 (%)</th>
+                                    <th class="px-3 py-2 text-center">Course Avg (%)</th>
+                                    <th class="px-4 py-2 text-center">Attached Proof</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white">
+                                {% for c in breakdown.feedback_a.a2_details %}
+                                <tr>
+                                    <td class="px-4 py-2.5 font-medium text-slate-800">{{ c.course_name }}</td>
+                                    <td class="px-3 py-2.5 text-center font-mono">{{ c.round_1|default:"-" }}%</td>
+                                    <td class="px-3 py-2.5 text-center font-mono">{{ c.round_2|default:"-" }}%</td>
+                                    <td class="px-3 py-2.5 text-center font-mono font-bold text-blue-600">{{ c.average }}%</td>
+                                    <td class="px-4 py-2.5 text-center">
+                                        {% if c.evidence_file %}
+                                        <div class="inline-flex items-center gap-1.5 justify-center flex-wrap">
+                                            <button type="button" onclick="openPreviewModal('inline_fb_even_{{ forloop.counter }}', '{{ c.course_name|escapejs }} – Feedback Report', '{{ c.evidence_file }}')" class="px-2.5 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-eye"></i>
+                                                <span>Preview</span>
+                                            </button>
+                                            <button type="button" onclick="toggleInlineVerify(this, 'fb_even_{{ forloop.counter }}')" data-verify-key="fb_even_{{ forloop.counter }}" data-verified="false" class="inline-verify-btn px-2.5 py-1 bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 border border-slate-300 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                                <span>Verify</span>
+                                            </button>
+                                            <button type="button" onclick="openRejectDialog('inline_fb_even_{{ forloop.counter }}', '{{ c.course_name|escapejs }} – Feedback Report', 'SEC1_A2', '{{ c.evidence_file }}')" class="inline-reject-btn px-2.5 py-1 bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-circle-xmark"></i>
+                                                <span>Reject</span>
+                                            </button>
+                                        </div>
+                                        <div id="status-fb_even_{{ forloop.counter }}" class="hidden mt-1 text-[10px] text-rose-600 font-medium"></div>
+                                        {% else %}
+                                        <span class="text-slate-400 italic">No file attached</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="px-4 py-3 text-center text-slate-400">No even semester courses recorded.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- B: Final Results -->
+                <div class="space-y-3 pt-3 border-t border-slate-100">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <h4 class="text-sm font-bold text-slate-800 flex items-center space-x-2">
+                            <span class="px-2 py-0.5 text-xs bg-emerald-500 text-slate-900 rounded font-bold">Component B</span>
+                            <span>Final Results Records (Max 20)</span>
+                        </h4>
+                        <span class="text-xs font-mono font-bold text-emerald-700">Verified B Marks: {{ breakdown.results_b.marks_awarded|default:"0" }} / 20</span>
+                    </div>
+
+                    <!-- Odd Results -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
+                        <div class="bg-slate-50 px-4 py-2 font-bold text-slate-700">Odd Semester Final Results</div>
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50 text-[11px] text-slate-500 uppercase">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Course Title</th>
+                                    <th class="px-3 py-2 text-center">Students Appeared</th>
+                                    <th class="px-3 py-2 text-center">Students Passed</th>
+                                    <th class="px-3 py-2 text-center">Pass %</th>
+                                    <th class="px-4 py-2 text-center">Attached Result Sheet</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white">
+                                {% for c in breakdown.results_b.b1_details %}
+                                <tr>
+                                    <td class="px-4 py-2.5 font-medium text-slate-800">{{ c.course_name }}</td>
+                                    <td class="px-3 py-2.5 text-center font-mono">{{ c.appeared }}</td>
+                                    <td class="px-3 py-2.5 text-center font-mono">{{ c.passed }}</td>
+                                    <td class="px-3 py-2.5 text-center font-mono font-bold text-emerald-600">{{ c.pass_percentage }}%</td>
+                                    <td class="px-4 py-2.5 text-center">
+                                        {% if c.evidence_file %}
+                                        <div class="inline-flex items-center gap-1.5 justify-center flex-wrap">
+                                            <button type="button" onclick="openPreviewModal('inline_res_odd_{{ forloop.counter }}', '{{ c.course_name|escapejs }} – Result Sheet', '{{ c.evidence_file }}')" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-eye"></i>
+                                                <span>Preview</span>
+                                            </button>
+                                            <button type="button" onclick="toggleInlineVerify(this, 'res_odd_{{ forloop.counter }}')" data-verify-key="res_odd_{{ forloop.counter }}" data-verified="false" class="inline-verify-btn px-2.5 py-1 bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 border border-slate-300 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                                <span>Verify</span>
+                                            </button>
+                                            <button type="button" onclick="openRejectDialog('inline_res_odd_{{ forloop.counter }}', '{{ c.course_name|escapejs }} – Result Sheet', 'SEC1_B1', '{{ c.evidence_file }}')" class="inline-reject-btn px-2.5 py-1 bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-circle-xmark"></i>
+                                                <span>Reject</span>
+                                            </button>
+                                        </div>
+                                        <div id="status-res_odd_{{ forloop.counter }}" class="hidden mt-1 text-[10px] text-rose-600 font-medium"></div>
+                                        {% else %}
+                                        <span class="text-slate-400 italic">No file attached</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="px-4 py-3 text-center text-slate-400">No odd semester results recorded.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Even Results -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
+                        <div class="bg-slate-50 px-4 py-2 font-bold text-slate-700">Even Semester Final Results</div>
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50 text-[11px] text-slate-500 uppercase">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Course Title</th>
+                                    <th class="px-3 py-2 text-center">Students Appeared</th>
+                                    <th class="px-3 py-2 text-center">Students Passed</th>
+                                    <th class="px-3 py-2 text-center">Pass %</th>
+                                    <th class="px-4 py-2 text-center">Attached Result Sheet</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white">
+                                {% for c in breakdown.results_b.b2_details %}
+                                <tr>
+                                    <td class="px-4 py-2.5 font-medium text-slate-800">{{ c.course_name }}</td>
+                                    <td class="px-3 py-2.5 text-center font-mono">{{ c.appeared }}</td>
+                                    <td class="px-3 py-2.5 text-center font-mono">{{ c.passed }}</td>
+                                    <td class="px-3 py-2.5 text-center font-mono font-bold text-emerald-600">{{ c.pass_percentage }}%</td>
+                                    <td class="px-4 py-2.5 text-center">
+                                        {% if c.evidence_file %}
+                                        <div class="inline-flex items-center gap-1.5 justify-center flex-wrap">
+                                            <button type="button" onclick="openPreviewModal('inline_res_even_{{ forloop.counter }}', '{{ c.course_name|escapejs }} – Result Sheet', '{{ c.evidence_file }}')" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-eye"></i>
+                                                <span>Preview</span>
+                                            </button>
+                                            <button type="button" onclick="toggleInlineVerify(this, 'res_even_{{ forloop.counter }}')" data-verify-key="res_even_{{ forloop.counter }}" data-verified="false" class="inline-verify-btn px-2.5 py-1 bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 border border-slate-300 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                                <span>Verify</span>
+                                            </button>
+                                            <button type="button" onclick="openRejectDialog('inline_res_even_{{ forloop.counter }}', '{{ c.course_name|escapejs }} – Result Sheet', 'SEC1_B2', '{{ c.evidence_file }}')" class="inline-reject-btn px-2.5 py-1 bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 border border-rose-200 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition">
+                                                <i class="fa-solid fa-circle-xmark"></i>
+                                                <span>Reject</span>
+                                            </button>
+                                        </div>
+                                        <div id="status-res_even_{{ forloop.counter }}" class="hidden mt-1 text-[10px] text-rose-600 font-medium"></div>
+                                        {% else %}
+                                        <span class="text-slate-400 italic">No file attached</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="px-4 py-3 text-center text-slate-400">No even semester results recorded.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- C: Other TLP Components -->
+                <div class="space-y-3 pt-3 border-t border-slate-100">
+                    <h4 class="text-sm font-bold text-slate-800 flex items-center space-x-2">
+                        <span class="px-2 py-0.5 text-xs bg-purple-600 text-white rounded font-bold">Component C</span>
+                        <span>Other Teaching-Learning Components (Claimed: {{ breakdown.other_tlp_c.total_c_score|default:"0" }} Marks)</span>
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
+                            <span class="font-bold text-slate-800 block">Own Syllabus for Core Subjects ({{ breakdown.other_tlp_c.components.c_ii.score|default:"0" }}/10)</span>
+                            <ul class="list-disc pl-4 text-slate-600 space-y-0.5">
+                                {% for it in breakdown.other_tlp_c.components.c_ii.items %}
+                                <li>{{ it.title }}</li>
+                                {% empty %}
+                                <li class="text-slate-400 italic">None claimed</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
+                            <span class="font-bold text-slate-800 block">External Funded Activities ({{ breakdown.other_tlp_c.components.c_iii.score|default:"0" }}/10)</span>
+                            <ul class="list-disc pl-4 text-slate-600 space-y-0.5">
+                                {% for it in breakdown.other_tlp_c.components.c_iii.items %}
+                                <li>{{ it.title }} (₹{{ it.funding_amount }} - {{ it.role }})</li>
+                                {% empty %}
+                                <li class="text-slate-400 italic">None claimed</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
+                            <span class="font-bold text-slate-800 block">NPTEL Certifications ({{ breakdown.other_tlp_c.components.c_vi.score|default:"0" }}/10)</span>
+                            <ul class="list-disc pl-4 text-slate-600 space-y-0.5">
+                                {% for it in breakdown.other_tlp_c.components.c_vi.items %}
+                                <li>{{ it.title }} ({{ it.grade_type }})</li>
+                                {% empty %}
+                                <li class="text-slate-400 italic">None claimed</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
+                            <span class="font-bold text-slate-800 block">AI Tools Used in TLP ({{ breakdown.other_tlp_c.components.c_ix.score|default:"0" }}/5)</span>
+                            <ul class="list-disc pl-4 text-slate-600 space-y-0.5">
+                                {% for it in breakdown.other_tlp_c.components.c_ix.items %}
+                                <li>{{ it.tool_name }}</li>
+                                {% empty %}
+                                <li class="text-slate-400 italic">None claimed</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: SECTION II DETAILS & PROOFS -->
+            <div id="hod-tab-sec2" class="hod-tab-content hidden p-6 space-y-6">
+                <div>
+                    <h4 class="text-sm font-bold text-slate-800 flex items-center justify-between pb-2 border-b border-slate-100 mb-3">
+                        <span>Publications with RNSIT Affiliation (Claimed: {{ breakdown.section2.components.sec2_ii.score|default:"0" }} / 30)</span>
+                    </h4>
+                    <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50 text-[11px] text-slate-500 uppercase">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Paper Title</th>
+                                    <th class="px-3 py-2 text-center">Category</th>
+                                    <th class="px-3 py-2 text-center">Author Order</th>
+                                    <th class="px-3 py-2 text-center">DOI / Link</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white">
+                                {% for p in breakdown.section2.components.sec2_ii.items %}
+                                <tr>
+                                    <td class="px-4 py-2.5 font-bold text-slate-800">{{ p.title }}</td>
+                                    <td class="px-3 py-2.5 text-center uppercase font-mono font-bold text-blue-700">{{ p.category }}</td>
+                                    <td class="px-3 py-2.5 text-center font-mono">{% if p.author_order <= 2 %}1st/2nd{% else %}3rd{% endif %}</td>
+                                    <td class="px-3 py-2.5 text-center font-mono text-[11px] text-slate-600">{{ p.doi|default:"-" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="px-4 py-3 text-center text-slate-400">No publications claimed.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Other R&D components summary -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
+                        <span class="font-bold text-slate-800 block">Research Funded Projects</span>
+                        <ul class="list-disc pl-4 text-slate-600">
+                            {% for p in breakdown.section2.components.sec2_v.items %}
+                            <li>{{ p.title }} (₹{{ p.funding_amount }} - {{ p.role }})</li>
+                            {% empty %}
+                            <li class="text-slate-400 italic">None claimed</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
+                        <span class="font-bold text-slate-800 block">IPR & Patents</span>
+                        <ul class="list-disc pl-4 text-slate-600">
+                            {% for p in breakdown.section2.components.sec2_vii.items %}
+                            <li>{{ p.title }} (Status: {{ p.status }})</li>
+                            {% empty %}
+                            <li class="text-slate-400 italic">None claimed</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: SECTION III DETAILS & PROOFS -->
+            <div id="hod-tab-sec3" class="hod-tab-content hidden p-6 space-y-4 text-xs">
+                <h4 class="text-sm font-bold text-slate-800 pb-2 border-b border-slate-100">Technical & Professional Activities (Claimed: {{ submission.section3_final_score }} / 20)</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
+                        <span class="font-bold text-slate-800 block">Industry Certifications</span>
+                        <ul class="list-disc pl-4 text-slate-600">
+                            {% for c in breakdown.section3.components.sec3_iv.items %}
+                            <li>{{ c.title }}</li>
+                            {% empty %}
+                            <li class="text-slate-400 italic">None claimed</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
+                        <span class="font-bold text-slate-800 block">Automation Software Deployed</span>
+                        <ul class="list-disc pl-4 text-slate-600">
+                            {% for a in breakdown.section3.components.sec3_xi.items %}
+                            <li>{{ a.title }}</li>
+                            {% empty %}
+                            <li class="text-slate-400 italic">None claimed</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: SECTION IV DEPARTMENTAL RESPONSIBILITIES -->
+            <div id="hod-tab-sec4" class="hod-tab-content hidden p-6 space-y-4">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <h4 class="text-sm font-bold text-slate-800">10 Departmental Responsibilities Listed by Faculty</h4>
+                    <span class="text-xs text-slate-500 font-mono">Max 20 Marks (Awarded by HOD)</span>
+                </div>
+                <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
+                    <table class="min-w-full divide-y divide-slate-200">
+                        <thead class="bg-slate-50 text-[11px] text-slate-500 uppercase">
+                            <tr>
+                                <th class="px-4 py-2 text-left w-12">#</th>
+                                <th class="px-4 py-2 text-left">Role / Committee</th>
+                                <th class="px-4 py-2 text-left">Specific Contribution & Measurable Outcome</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            {% for r in breakdown.section4.responsibilities %}
+                            <tr>
+                                <td class="px-4 py-2.5 font-mono text-slate-400">{{ forloop.counter }}</td>
+                                <td class="px-4 py-2.5 font-bold text-slate-800">{{ r.role }}</td>
+                                <td class="px-4 py-2.5 text-slate-600">{{ r.contribution }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="px-4 py-3 text-center text-slate-400">No departmental responsibilities recorded.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 5: ALL UPLOADED PROOFS REPOSITORY -->
+            <div id="hod-tab-docs" class="hod-tab-content hidden p-6 space-y-4">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-800">Uploaded Supporting Documentary Evidence</h4>
+                        <p class="text-xs text-slate-500">Every certificate, sanction letter, and paper PDF attached by the faculty.</p>
+                    </div>
+                    <span class="px-3 py-1 bg-rose-50 text-rose-700 font-mono font-bold text-xs rounded-lg border border-rose-200">{{ evidence_docs|length }} Documents</span>
+                </div>
+
+                <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
+                    <table class="min-w-full divide-y divide-slate-200">
+                        <thead class="bg-slate-50 text-[11px] text-slate-500 uppercase">
+                            <tr>
+                                <th class="px-4 py-2.5 text-left">Document Name</th>
+                                <th class="px-3 py-2.5 text-center">PBAS Component</th>
+                                <th class="px-3 py-2.5 text-center">Size</th>
+                                <th class="px-3 py-2.5 text-center">Validation</th>
+                                <th class="px-4 py-2.5 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            {% for doc in evidence_docs %}
+                            <tr class="hover:bg-slate-50 transition" id="doc-row-{{ doc.id }}">
+                                <td class="px-4 py-3 font-semibold text-slate-800">
+                                    <div class="flex items-center space-x-2">
+                                        {% if doc.original_filename|lower|slice:"-4:" == ".pdf" %}
+                                        <i class="fa-regular fa-file-pdf text-rose-500 text-sm flex-shrink-0"></i>
+                                        {% elif doc.original_filename|lower|slice:"-4:" == ".png" or doc.original_filename|lower|slice:"-4:" == ".jpg" %}
+                                        <i class="fa-regular fa-file-image text-blue-500 text-sm flex-shrink-0"></i>
+                                        {% else %}
+                                        <i class="fa-regular fa-file-lines text-slate-500 text-sm flex-shrink-0"></i>
+                                        {% endif %}
+                                        <span class="truncate max-w-xs">{{ doc.original_filename }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-3 py-3 text-center font-mono font-bold text-slate-600 text-[11px]">{{ doc.component_code }}</td>
+                                <td class="px-3 py-3 text-center font-mono text-slate-400">{{ doc.file_size_kb }} KB</td>
+                                <td class="px-3 py-3 text-center" id="verify-cell-{{ doc.id }}">
+                                    {% if doc.status == 'REJECTED' %}
+                                    <span class="px-2 py-0.5 bg-rose-100 text-rose-700 font-bold rounded-full text-[11px] border border-rose-300 inline-flex items-center space-x-1" title="{{ doc.rejection_reason|default:'' }}">
+                                        <i class="fa-solid fa-circle-xmark"></i><span>Rejected</span>
+                                    </span>
+                                    {% if doc.rejection_reason %}
+                                    <span class="block text-[10px] text-rose-600 mt-1 max-w-[130px] truncate mx-auto font-medium" title="{{ doc.rejection_reason }}">"{{ doc.rejection_reason }}"</span>
+                                    {% endif %}
+                                    {% elif doc.is_verified or doc.status == 'VERIFIED' %}
+                                    <span class="verified-badge px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold rounded-full text-[11px] border border-emerald-300 inline-flex items-center space-x-1">
+                                        <i class="fa-solid fa-circle-check"></i><span>Verified</span>
+                                    </span>
+                                    {% else %}
+                                    <span class="unverified-badge px-2 py-0.5 bg-amber-50 text-amber-700 font-semibold rounded-full text-[11px] border border-amber-200 inline-flex items-center space-x-1">
+                                        <i class="fa-solid fa-clock"></i><span>Pending</span>
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                                        <!-- Preview inline in portal -->
+                                        <button onclick="openPreviewModal('{{ doc.id }}', '{{ doc.original_filename|escapejs }}', '/evidence/preview/{{ doc.id }}/')"
+                                            class="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold rounded-lg transition inline-flex items-center space-x-1 shadow-sm">
+                                            <i class="fa-solid fa-eye"></i>
+                                            <span>Preview</span>
+                                        </button>
+                                        <!-- Toggle Verify -->
+                                        <button onclick="toggleVerify({{ doc.id }}, this)"
+                                            data-evidence-id="{{ doc.id }}"
+                                            data-verified="{{ doc.is_verified|yesno:'true,false' }}"
+                                            class="verify-toggle-btn px-2.5 py-1.5 {% if doc.is_verified %}bg-emerald-500 hover:bg-emerald-600 text-white{% else %}bg-slate-200 hover:bg-emerald-500 hover:text-white text-slate-700{% endif %} text-[11px] font-semibold rounded-lg transition inline-flex items-center space-x-1">
+                                            <i class="fa-solid {% if doc.is_verified %}fa-check-circle{% else %}fa-circle-check{% endif %}"></i>
+                                            <span>{% if doc.is_verified %}Verified ✓{% else %}Verify{% endif %}</span>
+                                        </button>
+                                        <!-- Reject with Review -->
+                                        <button onclick="openRejectDialog('{{ doc.id }}', '{{ doc.original_filename|escapejs }}', '{{ doc.component_code }}', '/evidence/preview/{{ doc.id }}/')"
+                                            class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 text-[11px] font-semibold rounded-lg transition inline-flex items-center space-x-1 border border-rose-200">
+                                            <i class="fa-solid fa-circle-xmark"></i>
+                                            <span>Reject</span>
+                                        </button>
+                                        <!-- Download -->
+                                        <a href="/evidence/download/{{ doc.id }}/"
+                                            class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold rounded-lg transition inline-flex items-center space-x-1 border border-slate-300">
+                                            <i class="fa-solid fa-download"></i>
+                                            <span>Download</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="px-4 py-6 text-center text-slate-400">No evidence documents found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    <!-- ============================================================ -->
+    <!-- DOCUMENT PREVIEW MODAL                                       -->
+    <!-- ============================================================ -->
+    <div id="previewModal" class="fixed inset-0 z-50 hidden" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closePreviewModal()"></div>
+        <!-- Panel -->
+        <div class="absolute inset-4 md:inset-8 lg:inset-12 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between px-5 py-3 border-b border-slate-200 bg-slate-50 flex-shrink-0">
+                <div class="flex items-center space-x-3 min-w-0">
+                    <i class="fa-solid fa-file-magnifying-glass text-blue-600"></i>
+                    <span id="previewModalTitle" class="text-sm font-bold text-slate-800 truncate">Document Preview</span>
+                </div>
+                <div class="flex items-center space-x-2 flex-shrink-0">
+                    <a id="previewModalDownload" href="#" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition inline-flex items-center space-x-1">
+                        <i class="fa-solid fa-download"></i><span>Download</span>
+                    </a>
+                    <button onclick="closePreviewModal()" class="w-8 h-8 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-600 flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal body — dynamic content (img for images, iframe for PDF/others) -->
+            <div class="flex-1 overflow-hidden relative bg-slate-100">
+                <!-- Spinner -->
+                <div id="previewSpinner" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 z-20">
+                    <svg class="animate-spin h-10 w-10 text-blue-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    <span class="text-slate-500 text-sm font-medium">Loading document…</span>
+                </div>
+                <!-- Content injected by JS -->
+                <div id="previewContentArea" class="absolute inset-0 overflow-auto"></div>
+            </div>
+
+            <!-- Modal footer with verify quick-action -->
+            <div id="previewModalFooter" class="flex items-center justify-between px-5 py-3 border-t border-slate-200 bg-slate-50 flex-shrink-0 text-xs">
+                <span class="text-slate-500">Review the document and use the Verify button to validate it.</span>
+                <div class="flex items-center space-x-2">
+                    <button id="previewVerifyBtn" onclick="toggleVerifyFromModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition inline-flex items-center space-x-1 shadow-sm">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span id="previewVerifyBtnLabel">Verify Document ✓</span>
+                    </button>
+                    <button id="previewRejectBtn" onclick="openRejectFromModal()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg transition inline-flex items-center space-x-1 shadow-sm">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <span>Reject with Review ✗</span>
+                    </button>
+                    <button onclick="closePreviewModal()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- REJECTION & REVIEW FEEDBACK MODAL                           -->
+    <!-- ============================================================ -->
+    <div id="rejectModal" class="fixed inset-0 z-[60] hidden" aria-modal="true">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeRejectModal()"></div>
+        <div class="relative max-w-lg mx-auto mt-24 bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200 z-10 mx-4">
+            <div class="px-6 py-4 bg-rose-50 border-b border-rose-200 flex items-center justify-between">
+                <div class="flex items-center space-x-2 text-rose-800">
+                    <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                    <h3 class="font-bold text-sm">Reject Evidence & Request Revision</h3>
+                </div>
+                <button onclick="closeRejectModal()" class="w-8 h-8 rounded-lg bg-white/80 hover:bg-white text-slate-500 hover:text-slate-800 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Document / Item:</label>
+                    <div id="rejectModalDocTitle" class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-mono font-medium text-slate-800 truncate"></div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">
+                        HOD Review Feedback & Rejection Reason <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea id="rejectReasonInput" rows="4" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none text-slate-800 text-xs" placeholder="Explain clearly why this document was rejected (e.g. 'Certificate missing HOD endorsement', 'Result sheet belongs to wrong semester', 'Please upload signed copy')..."></textarea>
+                    <p class="text-[11px] text-slate-400 mt-1">This review feedback will be delivered instantly to the Faculty Portal notification center.</p>
+                </div>
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2">
+                    <button type="button" onclick="closeRejectModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition">Cancel</button>
+                    <button type="button" onclick="submitRejectionReview()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg shadow-sm transition inline-flex items-center space-x-1.5">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Reject & Send Review</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- HOD Grading & Evaluation Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-2">
+                        <i class="fa-solid fa-star text-amber-500"></i>
+                        <span>HOD Evaluation Rubric (15 Marks) & Administration Score (20 Marks)</span>
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Award verified marks based on faculty evidence and conduct.</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] uppercase text-slate-400 block font-semibold">HOD Criteria Total</span>
+                    <span id="label-hod-total" class="text-xl font-mono font-black text-amber-500">15.0 / 15</span>
+                </div>
+            </div>
+
+            <!-- Section IV Administration Marks Awarded by HOD -->
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div>
+                    <h4 class="font-bold text-slate-800">Award Marks for Section IV: Departmental Responsibilities (Max 20)</h4>
+                    <p class="text-slate-500 text-[11px]">Evaluated based on the listed contributions and documentary evidence above.</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="number" id="sec4_score" min="0" max="20" step="0.5" value="{{ submission.section4_final_score|default:'16' }}" class="w-20 px-2 py-1.5 border border-slate-300 rounded-lg text-center font-mono font-bold text-sm bg-white">
+                    <span class="text-slate-500 font-semibold">/ 20</span>
+                </div>
+            </div>
+
+            <!-- 5 HOD Criteria (3 marks each, max 15) -->
+            <div class="space-y-3 text-xs">
+                <h4 class="font-bold text-slate-800">5 Departmental Criteria Evaluation (3 Marks Each; Max 15 Marks)</h4>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                        <span class="text-slate-700 font-medium">1. Discipline / Regularity / Punctuality / Attitude (0-3)</span>
+                        <input type="number" id="hod_c1" min="0" max="3" step="0.5" value="3" oninput="recalcHODTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold bg-white">
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                        <span class="text-slate-700 font-medium">2. Academic Planning & Quality Improvement (0-3)</span>
+                        <input type="number" id="hod_c2" min="0" max="3" step="0.5" value="3" oninput="recalcHODTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold bg-white">
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                        <span class="text-slate-700 font-medium">3. Department Administrative Activities & Support (0-3)</span>
+                        <input type="number" id="hod_c3" min="0" max="3" step="0.5" value="3" oninput="recalcHODTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold bg-white">
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                        <span class="text-slate-700 font-medium">4. NBA, NAAC, NIRF, FDP Coordination (0-3)</span>
+                        <input type="number" id="hod_c4" min="0" max="3" step="0.5" value="3" oninput="recalcHODTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold bg-white">
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between md:col-span-2">
+                        <span class="text-slate-700 font-medium">5. Autonomous Activities Involvement & Support (0-3)</span>
+                        <input type="number" id="hod_c5" min="0" max="3" step="0.5" value="3" oninput="recalcHODTotal()" class="w-16 px-2 py-1 border border-slate-300 rounded text-center font-mono font-bold bg-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remarks & Recommendation -->
+            <div class="space-y-2 text-xs">
+                <label class="block font-semibold text-slate-700">HOD Remarks & Recommendations</label>
+                <textarea id="hod_remarks" rows="3" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Enter HOD remarks, observations, and recommendations for annual increment..."></textarea>
+            </div>
+
+            <div class="flex items-center space-x-2 pt-1 text-xs">
+                <input type="checkbox" id="increment_recommended" checked class="w-4 h-4 text-emerald-600 rounded">
+                <label for="increment_recommended" class="text-slate-800 font-semibold cursor-pointer">Annual Increment Recommended</label>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+                <a href="/hod/" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">Cancel</a>
+                <button type="button" onclick="submitHODReview()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center space-x-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Verify & Forward to Principal</span>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // ─── Tab Switching ───────────────────────────────────────────────
+        function switchHODTab(tabId) {
+            document.querySelectorAll('.hod-tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.hod-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+                btn.classList.add('text-slate-600');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-600');
+                activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+            }
+        }
+
+        // ─── HOD Score Recalc ─────────────────────────────────────────────
+        function recalcHODTotal() {
+            const c1 = parseFloat(document.getElementById('hod_c1').value) || 0;
+            const c2 = parseFloat(document.getElementById('hod_c2').value) || 0;
+            const c3 = parseFloat(document.getElementById('hod_c3').value) || 0;
+            const c4 = parseFloat(document.getElementById('hod_c4').value) || 0;
+            const c5 = parseFloat(document.getElementById('hod_c5').value) || 0;
+            const total = Math.min(c1 + c2 + c3 + c4 + c5, 15.0);
+            document.getElementById('label-hod-total').innerText = `${total.toFixed(1)} / 15`;
+        }
+
+        // ─── HOD Submit Review ────────────────────────────────────────────
+        function submitHODReview() {
+            const data = {
+                submission_id: {{ submission.id }},
+                sec4_score: document.getElementById('sec4_score').value,
+                hod_c1: document.getElementById('hod_c1').value,
+                hod_c2: document.getElementById('hod_c2').value,
+                hod_c3: document.getElementById('hod_c3').value,
+                hod_c4: document.getElementById('hod_c4').value,
+                hod_c5: document.getElementById('hod_c5').value,
+                hod_remarks: document.getElementById('hod_remarks').value,
+                increment_recommended: document.getElementById('increment_recommended').checked
+            };
+
+            fetch('/api/hod/review/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    alert('HOD Evaluation saved successfully! Verified & Forwarded to Principal.');
+                    window.location.href = '/hod/';
+                } else {
+                    alert('Error: ' + res.error);
+                }
+            })
+            .catch(err => alert('Network error: ' + err));
+        }
+
+        // ─── DOCUMENT PREVIEW MODAL ───────────────────────────────────────
+        let _currentEvidenceId = null;
+        let _currentVerified = false;
+
+        const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'];
+
+        function detectExtension(url, filename) {
+            if (url) {
+                const clean = url.split('#')[0].split('?')[0];
+                const parts = clean.split('.');
+                if (parts.length > 1) return parts.pop().toLowerCase();
+            }
+            if (filename) {
+                const parts = filename.split('.');
+                if (parts.length > 1) return parts.pop().toLowerCase();
+            }
+            return '';
+        }
+
+        function openPreviewModal(evidenceId, filename, previewUrl) {
+            _currentEvidenceId = evidenceId;
+            _currentVerified = false;
+
+            if (evidenceId.startsWith('inline_')) {
+                const key = evidenceId.replace('inline_', '');
+                const btn = document.querySelector(`[data-verify-key="${key}"]`);
+                if (btn) _currentVerified = (btn.dataset.verified === 'true');
+                document.getElementById('previewModalDownload').href = previewUrl;
+                document.getElementById('previewVerifyBtn').style.display = 'inline-flex';
+                updateVerifyBtnUI();
+            } else if (evidenceId !== 'inline') {
+                const btn = document.querySelector(`[data-evidence-id="${evidenceId}"]`);
+                if (btn) _currentVerified = btn.dataset.verified === 'true';
+                document.getElementById('previewModalDownload').href = `/evidence/download/${evidenceId}/`;
+                document.getElementById('previewVerifyBtn').style.display = 'inline-flex';
+                updateVerifyBtnUI();
+            } else {
+                document.getElementById('previewModalDownload').href = previewUrl;
+                document.getElementById('previewVerifyBtn').style.display = 'none';
+            }
+
+            document.getElementById('previewModalTitle').textContent = filename || 'Document Preview';
+
+            // Show modal first
+            document.getElementById('previewModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            // Load content based on type
+            _loadPreviewContent(previewUrl, filename);
+        }
+
+        function _loadPreviewContent(url, filename) {
+            const container = document.getElementById('previewContentArea');
+            const spinner = document.getElementById('previewSpinner');
+            spinner.style.display = 'flex';
+            container.innerHTML = '';
+
+            const ext = detectExtension(url, filename);
+
+            // 1. Direct Image Preview
+            if (IMAGE_EXTS.includes(ext)) {
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = 'max-w-full max-h-full object-contain mx-auto block rounded-lg shadow-md';
+                img.style.maxHeight = '100%';
+                img.onload = () => { spinner.style.display = 'none'; };
+                img.onerror = () => {
+                    spinner.style.display = 'none';
+                    container.innerHTML = _errorHTML('Image could not be loaded.', url);
+                };
+                container.style.display = 'flex';
+                container.style.alignItems = 'center';
+                container.style.justifyContent = 'center';
+                container.style.padding = '20px';
+                container.appendChild(img);
+                return;
+            }
+
+            // 2. Determine target URL for iframe (use raw preview endpoint if it is a /media/ URL)
+            let targetUrl = url;
+            if (url.startsWith('/media/') || url.includes('/media/')) {
+                targetUrl = `/evidence/preview/raw/?url=${encodeURIComponent(url)}`;
+            }
+
+            // 3. Render in iframe with fast spinner dismissal
+            container.style.display = 'block';
+            container.style.padding = '0';
+            const iframe = document.createElement('iframe');
+            iframe.src = targetUrl;
+            iframe.className = 'w-full h-full border-0';
+            iframe.title = filename || 'Document Preview';
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.onload = () => { spinner.style.display = 'none'; };
+            iframe.onerror = () => {
+                spinner.style.display = 'none';
+                container.innerHTML = _errorHTML('Document could not be previewed directly.', url);
+            };
+            container.appendChild(iframe);
+
+            // Safety timeout: dismiss spinner after 450ms so UI is never stuck
+            setTimeout(() => {
+                if (spinner) spinner.style.display = 'none';
+            }, 450);
+        }
+
+        function _errorHTML(msg, url) {
+            return `<div style="text-align:center;padding:48px 24px;font-family:sans-serif;color:#64748b">
+                <div style="font-size:48px;margin-bottom:12px">📄</div>
+                <p style="font-weight:700;color:#1e293b;margin-bottom:8px">${msg}</p>
+                <div style="margin-top:16px;display:flex;gap:12px;justify-content:center;">
+                    <a href="${url}" download style="padding:10px 20px;background:#2563eb;color:white;border-radius:8px;text-decoration:none;font-weight:600;font-size:13px">⬇ Download File</a>
+                    <a href="${url}" target="_blank" style="padding:10px 20px;background:#e2e8f0;color:#1e293b;border-radius:8px;text-decoration:none;font-weight:600;font-size:13px">Open in New Tab</a>
+                </div>
+            </div>`;
+        }
+
+        function closePreviewModal() {
+            document.getElementById('previewModal').classList.add('hidden');
+            document.body.style.overflow = '';
+            setTimeout(() => { document.getElementById('previewContentArea').innerHTML = ''; }, 200);
+        }
+
+        // ─── REJECTION & REVIEW HANDLING ─────────────────────────────────
+        let _rejectTarget = null;
+
+        function openRejectDialog(targetId, title, componentCode, fileUrl) {
+            _rejectTarget = {
+                id: targetId,
+                title: title,
+                componentCode: componentCode || 'PROOF',
+                fileUrl: fileUrl || '',
+                isInline: typeof targetId === 'string' && targetId.startsWith('inline_'),
+                itemKey: typeof targetId === 'string' && targetId.startsWith('inline_') ? targetId.replace('inline_', '') : ''
+            };
+            document.getElementById('rejectModalDocTitle').textContent = title || 'Document Evidence';
+            document.getElementById('rejectReasonInput').value = '';
+            document.getElementById('rejectModal').classList.remove('hidden');
+            document.getElementById('rejectReasonInput').focus();
+        }
+
+        function openRejectFromModal() {
+            if (!_currentEvidenceId) return;
+            const title = document.getElementById('previewModalTitle').textContent;
+            let fileUrl = document.getElementById('previewModalDownload').href;
+            openRejectDialog(_currentEvidenceId, title, 'PROOF', fileUrl);
+        }
+
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.add('hidden');
+            _rejectTarget = null;
+        }
+
+        function submitRejectionReview() {
+            if (!_rejectTarget) return;
+            const target = Object.assign({}, _rejectTarget);
+            const reason = document.getElementById('rejectReasonInput').value.trim();
+            if (!reason) {
+                alert('Please enter a review reason explaining why this document was rejected.');
+                document.getElementById('rejectReasonInput').focus();
+                return;
+            }
+
+            const sendBtn = document.querySelector('#rejectModal button[onclick="submitRejectionReview()"]');
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i><span>Sending Review...</span>';
+            }
+
+            if (target.isInline) {
+                fetch('/api/evidence/reject-inline/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        submission_id: {{ submission.id }},
+                        component_title: target.title,
+                        component_code: target.componentCode,
+                        item_key: target.itemKey,
+                        file_url: target.fileUrl,
+                        reason: reason
+                    })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (sendBtn) {
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i><span>Reject & Send Review</span>';
+                    }
+                    if (res.success) {
+                        closeRejectModal();
+                        closePreviewModal();
+                        const verifyBtn = document.querySelector(`[data-verify-key="${target.itemKey}"]`);
+                        if (verifyBtn) setInlineVerifyState(verifyBtn, false);
+
+                        const statusEl = document.getElementById(`status-${target.itemKey}`);
+                        if (statusEl) {
+                            statusEl.innerHTML = `<span class="inline-flex items-center space-x-1 text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200"><i class="fa-solid fa-circle-xmark"></i><span>Rejected by HOD: "${reason}"</span></span>`;
+                            statusEl.classList.remove('hidden');
+                        }
+
+                        const storageKey = 'pbas_rejected_{{ submission.id }}';
+                        let stored = {};
+                        try { stored = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e){}
+                        stored[target.itemKey] = reason;
+                        localStorage.setItem(storageKey, JSON.stringify(stored));
+
+                        alert('Document rejected. Review feedback and notification sent to the Faculty Portal!');
+                    } else {
+                        alert('Error: ' + res.error);
+                    }
+                })
+                .catch(err => {
+                    if (sendBtn) {
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i><span>Reject & Send Review</span>';
+                    }
+                    alert('Network error: ' + err);
+                });
+            } else {
+                fetch(`/api/evidence/${target.id}/reject/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason: reason })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (sendBtn) {
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i><span>Reject & Send Review</span>';
+                    }
+                    if (res.success) {
+                        closeRejectModal();
+                        closePreviewModal();
+                        const cell = document.getElementById(`verify-cell-${target.id}`);
+                        if (cell) {
+                            cell.innerHTML = `
+                                <span class="px-2 py-0.5 bg-rose-100 text-rose-700 font-bold rounded-full text-[11px] border border-rose-300 inline-flex items-center space-x-1">
+                                    <i class="fa-solid fa-circle-xmark"></i><span>Rejected</span>
+                                </span>
+                                <span class="block text-[10px] text-rose-600 mt-1 max-w-[130px] truncate mx-auto font-medium" title="${reason}">"${reason}"</span>
+                            `;
+                        }
+                        const vBtn = document.querySelector(`[data-evidence-id="${target.id}"]`);
+                        if (vBtn) {
+                            vBtn.dataset.verified = 'false';
+                            vBtn.className = 'verify-toggle-btn px-2.5 py-1.5 bg-slate-200 hover:bg-emerald-500 hover:text-white text-slate-700 text-[11px] font-semibold rounded-lg transition inline-flex items-center space-x-1';
+                            vBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i><span>Verify</span>';
+                        }
+                        alert('Document rejected. Review feedback and notification sent to the Faculty Portal!');
+                    } else {
+                        alert('Error: ' + res.error);
+                    }
+                })
+                .catch(err => {
+                    if (sendBtn) {
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i><span>Reject & Send Review</span>';
+                    }
+                    alert('Network error: ' + err);
+                });
+            }
+        }
+
+        // ─── Verify Toggle ────────────────────────────────────────────────
+        function toggleVerify(evidenceId, btnEl) {
+            const newVerified = btnEl.dataset.verified !== 'true';
+            fetch(`/api/evidence/${evidenceId}/verify/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ verified: newVerified })
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    btnEl.dataset.verified = res.is_verified ? 'true' : 'false';
+                    if (res.is_verified) {
+                        btnEl.className = 'verify-toggle-btn px-2.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-semibold rounded-lg transition inline-flex items-center space-x-1';
+                        btnEl.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>Verified ✓</span>';
+                    } else {
+                        btnEl.className = 'verify-toggle-btn px-2.5 py-1.5 bg-slate-200 hover:bg-emerald-500 hover:text-white text-slate-700 text-[11px] font-semibold rounded-lg transition inline-flex items-center space-x-1';
+                        btnEl.innerHTML = '<i class="fa-solid fa-circle-check"></i><span>Verify</span>';
+                    }
+                    const cell = document.getElementById(`verify-cell-${evidenceId}`);
+                    if (cell) {
+                        cell.innerHTML = res.is_verified
+                            ? `<span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold rounded-full text-[11px] border border-emerald-300 inline-flex items-center space-x-1"><i class="fa-solid fa-circle-check"></i><span>Verified</span></span>`
+                            : `<span class="px-2 py-0.5 bg-amber-50 text-amber-700 font-semibold rounded-full text-[11px] border border-amber-200 inline-flex items-center space-x-1"><i class="fa-solid fa-clock"></i><span>Pending</span></span>`;
+                    }
+                    if (_currentEvidenceId == evidenceId) {
+                        _currentVerified = res.is_verified;
+                        updateVerifyBtnUI();
+                    }
+                } else {
+                    alert('Error: ' + (res.error || 'Unknown'));
+                }
+            })
+            .catch(() => alert('Network error while updating verification.'));
+        }
+
+        function toggleVerifyFromModal() {
+            if (!_currentEvidenceId) return;
+            if (_currentEvidenceId.startsWith('inline_')) {
+                const key = _currentEvidenceId.replace('inline_', '');
+                const btn = document.querySelector(`[data-verify-key="${key}"]`);
+                if (btn) toggleInlineVerify(btn, key);
+                return;
+            }
+            const btn = document.querySelector(`[data-evidence-id="${_currentEvidenceId}"]`);
+            if (btn) toggleVerify(_currentEvidenceId, btn);
+        }
+
+        // ─── Inline Course Verification (Feedback & Results rows) ─────────
+        function toggleInlineVerify(btnEl, key) {
+            const isVerified = btnEl.dataset.verified === 'true';
+            const newStatus = !isVerified;
+            setInlineVerifyState(btnEl, newStatus);
+
+            const storageKey = 'pbas_verified_{{ submission.id }}';
+            let stored = {};
+            try { stored = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e){}
+            stored[key] = newStatus;
+            localStorage.setItem(storageKey, JSON.stringify(stored));
+
+            if (_currentEvidenceId === 'inline_' + key) {
+                _currentVerified = newStatus;
+                updateVerifyBtnUI();
+            }
+        }
+
+        function setInlineVerifyState(btnEl, isVerified) {
+            btnEl.dataset.verified = isVerified ? 'true' : 'false';
+            if (isVerified) {
+                btnEl.className = 'inline-verify-btn px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600 rounded-lg text-[11px] font-bold inline-flex items-center space-x-1 shadow-sm transition';
+                btnEl.innerHTML = '<i class="fa-solid fa-check-circle"></i><span>Verified ✓</span>';
+            } else {
+                btnEl.className = 'inline-verify-btn px-2.5 py-1 bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 border border-slate-300 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1 shadow-sm transition';
+                btnEl.innerHTML = '<i class="fa-solid fa-circle-check"></i><span>Verify</span>';
+            }
+        }
+
+        function restoreInlineVerifications() {
+            const storageKey = 'pbas_verified_{{ submission.id }}';
+            let stored = {};
+            try { stored = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e){}
+            document.querySelectorAll('.inline-verify-btn').forEach(btn => {
+                const key = btn.dataset.verifyKey;
+                if (key && stored[key]) {
+                    setInlineVerifyState(btn, true);
+                }
+            });
+
+            // Restore rejected items
+            const rejStorageKey = 'pbas_rejected_{{ submission.id }}';
+            let rejStored = {};
+            try { rejStored = JSON.parse(localStorage.getItem(rejStorageKey) || '{}'); } catch(e){}
+            
+            // Server-rendered rejected items
+            const serverRejected = {{ payload.rejected_items|default:'{}'|safe }};
+            const allRejected = Object.assign({}, rejStored, serverRejected);
+
+            for (let key in allRejected) {
+                const statusEl = document.getElementById(`status-${key}`);
+                const data = allRejected[key];
+                const reasonText = (typeof data === 'object' && data.reason) ? data.reason : data;
+                if (statusEl && reasonText) {
+                    statusEl.innerHTML = `<span class="inline-flex items-center space-x-1 text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200"><i class="fa-solid fa-circle-xmark"></i><span>Rejected by HOD: "${reasonText}"</span></span>`;
+                    statusEl.classList.remove('hidden');
+                }
+                const verifyBtn = document.querySelector(`[data-verify-key="${key}"]`);
+                if (verifyBtn) {
+                    setInlineVerifyState(verifyBtn, false);
+                }
+            }
+        }
+
+        function updateVerifyBtnUI() {
+            const btn = document.getElementById('previewVerifyBtn');
+            const label = document.getElementById('previewVerifyBtnLabel');
+            if (_currentVerified) {
+                btn.className = 'px-3 py-1.5 bg-slate-300 hover:bg-amber-500 hover:text-white text-slate-700 font-semibold rounded-lg transition inline-flex items-center space-x-1';
+                label.textContent = 'Mark Unverified';
+            } else {
+                btn.className = 'px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition inline-flex items-center space-x-1 shadow-sm';
+                label.textContent = 'Verify Document ✓';
+            }
+        }
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreviewModal(); });
+        document.addEventListener('DOMContentLoaded', () => {
+            recalcHODTotal();
+            restoreInlineVerifications();
+        });
+    </script>
+</body>
+</html>

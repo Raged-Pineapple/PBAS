@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNSIT PBAS - HOD Evaluation Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a' },
+                        rnsit: { blue: '#1d4ed8', dark: '#1e3a8a', gold: '#f59e0b' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
+    <!-- Top Header -->
+    <header class="bg-rnsit-dark text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold text-xl border border-amber-400/30">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-base font-bold">HOD Evaluation Portal</h1>
+                        <span class="px-2 py-0.5 text-[11px] font-semibold bg-amber-500/30 text-amber-300 border border-amber-400/30 rounded-full">Department Reviewer</span>
+                    </div>
+                    <p class="text-xs text-slate-300">{{ user_name }} | {{ department }}</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <a href="/faculty/" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-lg transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span>Switch to Faculty Portal</span>
+                </a>
+                <a href="/logout/" class="px-3 py-1.5 bg-rose-600/80 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-slate-900 to-navy-800 text-white p-6 rounded-2xl shadow-sm border border-slate-700 flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Department Administration & Review</span>
+                <h2 class="text-xl font-black mt-1">Faculty Appraisal Verification & Evaluation</h2>
+                <p class="text-xs text-slate-300 mt-1 max-w-2xl">
+                    Review faculty documentary evidence, evaluate the 5 HOD Departmental Criteria (max 15 marks), assign Section IV marks (max 20), and forward verified submissions to the Principal.
+                </p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 px-4 py-2 rounded-xl border border-white/20 text-center">
+                    <span class="text-[10px] uppercase text-slate-300 font-semibold block">Total Submissions</span>
+                    <span class="text-2xl font-black font-mono text-amber-400">{{ submissions|length }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Faculty Submissions Table Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="font-bold text-sm text-slate-800 flex items-center space-x-2">
+                    <i class="fa-solid fa-list-check text-blue-600"></i>
+                    <span>Department Faculty Submissions</span>
+                </h3>
+                <span class="text-xs text-slate-500 font-mono">Academic Year 2026-2027</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200 text-xs">
+                    <thead class="bg-slate-50 font-bold text-slate-600 uppercase">
+                        <tr>
+                            <th class="px-5 py-3 text-left">Faculty Member</th>
+                            <th class="px-4 py-3 text-center">Sec I (70)</th>
+                            <th class="px-4 py-3 text-center">Sec II (40)</th>
+                            <th class="px-4 py-3 text-center">Sec III (20)</th>
+                            <th class="px-4 py-3 text-center">Scaled (80)</th>
+                            <th class="px-4 py-3 text-center">HOD (15)</th>
+                            <th class="px-4 py-3 text-center">Total (100)</th>
+                            <th class="px-4 py-3 text-center">Status</th>
+                            <th class="px-5 py-3 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        {% for sub in submissions %}
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-5 py-3.5">
+                                <div class="font-bold text-slate-800 text-sm">{{ sub.faculty_name }}</div>
+                                <div class="text-[11px] text-slate-500 font-mono">ID: {{ sub.employee_id|default:"N/A" }} | {{ sub.department }}</div>
+                            </td>
+                            <td class="px-4 py-3 text-center font-mono font-bold text-blue-700">{{ sub.section1_final_score }}</td>
+                            <td class="px-4 py-3 text-center font-mono font-bold text-cyan-700">{{ sub.section2_final_score }}</td>
+                            <td class="px-4 py-3 text-center font-mono font-bold text-purple-700">{{ sub.section3_final_score }}</td>
+                            <td class="px-4 py-3 text-center font-mono font-bold text-amber-700 bg-amber-50/50">{{ sub.scaled_80 }}</td>
+                            <td class="px-4 py-3 text-center font-mono font-bold text-blue-800">{{ sub.hod_score }}</td>
+                            <td class="px-4 py-3 text-center font-mono font-black text-slate-900 text-sm">{{ sub.grand_total_100 }}</td>
+                            <td class="px-4 py-3 text-center">
+                                {% if sub.status == 'APPROVED' %}
+                                <span class="px-2.5 py-1 text-[10px] font-bold bg-emerald-100 text-emerald-800 rounded-full border border-emerald-300">Approved</span>
+                                {% elif sub.status == 'VERIFIED' %}
+                                <span class="px-2.5 py-1 text-[10px] font-bold bg-blue-100 text-blue-800 rounded-full border border-blue-300">HOD Verified</span>
+                                {% else %}
+                                <span class="px-2.5 py-1 text-[10px] font-bold bg-amber-100 text-amber-800 rounded-full border border-amber-300">Submitted</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-5 py-3 text-center">
+                                <div class="flex items-center justify-center space-x-2">
+                                    <a href="/hod/evaluate/{{ sub.id }}/" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition flex items-center space-x-1">
+                                        <i class="fa-solid fa-clipboard-check"></i>
+                                        <span>Evaluate</span>
+                                    </a>
+                                    <a href="/export/pdf/{{ sub.id }}/" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg border border-slate-300 transition flex items-center space-x-1" title="Download PDF">
+                                        <i class="fa-solid fa-file-pdf text-rose-600"></i>
+                                        <span>PDF</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-8 text-slate-400">
+                                No faculty submissions found yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>
