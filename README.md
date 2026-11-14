@@ -85,8 +85,8 @@ The platform features a single **Unified Sign-In Portal** (`/login/`) that direc
 # 1. Navigate to the project directory
 cd d:\rnsitportal\PBAS
 
-# 2. Install dependencies (if not already installed)
-python -m pip install django python-dotenv
+# 2. Install dependencies from requirements.txt
+python -m pip install -r requirements.txt
 
 # 3. Apply database migrations
 python manage.py migrate
