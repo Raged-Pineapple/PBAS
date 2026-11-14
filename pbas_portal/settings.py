@@ -24,6 +24,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # PBAS Modular App
     'section1.apps.Section1Config',
+    'onboarding_offboarding.apps.OnboardingOffboardingConfig',
+    'leave_management.apps.LeaveManagementConfig',
+    'salary_payroll.apps.SalaryPayrollConfig',
+    'core_portal.apps.CorePortalConfig',
 ]
 
 MIDDLEWARE = [

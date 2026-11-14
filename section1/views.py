@@ -71,11 +71,11 @@ def login_view(request):
             request.session['employee_id'] = user_info.get('employee_id', '')
 
             if authenticated_role == 'HOD':
-                return redirect('hod_portal')
+                return redirect('master_dashboard')
             elif authenticated_role == 'PRINCIPAL':
-                return redirect('principal_portal')
+                return redirect('master_dashboard')
             else:
-                return redirect('faculty_portal')
+                return redirect('master_dashboard')
         else:
             error = "Invalid username or password for selected role. (Check .env credentials)"
 

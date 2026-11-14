@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offboarding & 6-Department Clearances — {{ employee.full_name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a' },
+                        rnsit: { blue: '#1d4ed8', dark: '#1e3a8a', gold: '#f59e0b', emerald: '#059669', slate: '#334155' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-16">
+
+    <!-- Header -->
+    <header class="bg-rnsit-dark text-white shadow-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <a href="/onboarding-offboarding/" class="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-base font-bold tracking-tight">Faculty Exit Lifecycle & 6-Department Clearances</h1>
+                    <p class="text-xs text-slate-300">Employee: <span class="font-bold text-amber-300">{{ employee.full_name }}</span> ({{ employee.employee_id }})</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <a href="/onboarding-offboarding/" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-semibold">
+                    Back to Hub
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Status Card -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <span class="text-xs font-mono text-slate-400 block">{{ employee.employee_id }} • {{ employee.department }}</span>
+                <h2 class="text-xl font-bold text-slate-900">{{ employee.full_name }} — {{ employee.designation }}</h2>
+                <p class="text-xs text-slate-600 mt-1">
+                    Resignation Submitted: <strong class="text-slate-800 font-mono">{{ offboarding.resignation_date|date:"d M Y" }}</strong> |
+                    Proposed Last Working Day: <strong class="text-slate-800 font-mono">{{ offboarding.proposed_last_day|date:"d M Y" }}</strong>
+                </p>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <span id="badge-status" class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs font-bold font-mono">
+                    {{ offboarding.get_status_display }}
+                </span>
+                <span id="badge-clearance-count" class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold font-mono">
+                    {{ offboarding.clearances_count }} / 6 Clearances
+                </span>
+            </div>
+        </div>
+
+        <!-- 8-Step Offboarding Progression Timeline -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center space-x-2">
+                <i class="fa-solid fa-list-ol"></i>
+                <span>End-to-End 8-Step Offboarding Process (Slide 9)</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                <!-- 01 Resignation -->
+                <div class="p-4 rounded-xl border border-emerald-300 bg-emerald-50/40 space-y-1.5">
+                    <div class="flex items-center justify-between font-bold text-slate-800">
+                        <span class="text-emerald-700">01. Resignation Submission</span>
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                    </div>
+                    <p class="text-[11px] text-slate-600">Reason: {{ offboarding.reason }}</p>
+                    <p class="text-[10px] text-slate-500 font-mono">Submitted: {{ offboarding.resignation_date|date:"d M Y" }}</p>
+                </div>
+
+                <!-- 02 HoD Review -->
+                <div class="p-4 rounded-xl border border-emerald-300 bg-emerald-50/40 space-y-1.5">
+                    <div class="flex items-center justify-between font-bold text-slate-800">
+                        <span class="text-emerald-700">02. HoD Review & Handover</span>
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                    </div>
+                    <p class="text-[11px] text-slate-600">{{ offboarding.hod_comments }}</p>
+                    <p class="text-[10px] text-slate-500 font-mono">Status: <strong class="text-emerald-700">{{ offboarding.hod_status }}</strong></p>
+                </div>
+
+                <!-- 03 Principal Approval -->
+                <div class="p-4 rounded-xl border border-emerald-300 bg-emerald-50/40 space-y-1.5">
+                    <div class="flex items-center justify-between font-bold text-slate-800">
+                        <span class="text-emerald-700">03. Principal Approval</span>
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                    </div>
+                    <p class="text-[11px] text-slate-600">{{ offboarding.principal_comments }}</p>
+                    <p class="text-[10px] text-slate-500 font-mono">Status: <strong class="text-emerald-700">{{ offboarding.principal_status }}</strong></p>
+                </div>
+
+                <!-- 04 Notice Period -->
+                <div class="p-4 rounded-xl border border-blue-300 bg-blue-50/40 space-y-1.5">
+                    <div class="flex items-center justify-between font-bold text-slate-800">
+                        <span class="text-blue-700">04. Notice-Period Monitor</span>
+                        <i class="fa-solid fa-clock text-blue-600"></i>
+                    </div>
+                    <p class="text-[11px] text-slate-600">Required: <strong>{{ offboarding.notice_period_required_days }} days</strong> | Served: <strong>{{ offboarding.notice_period_served_days }} days</strong></p>
+                    <p class="text-[10px] text-emerald-600 font-bold">Shortfall: 0 Days (Notice Satisfied)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 05 Department-Wise Clearances (Interactive 6 Clearances) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800">05. Department-Wise Clearances (No-Dues Verification)</h3>
+                    <p class="text-xs text-slate-500">Slide 9 Step 05: Click any department badge below to toggle clearance verification</p>
+                </div>
+                <span class="text-xs text-slate-400 font-mono">Interactive Live Toggles</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 1. Library Clearance -->
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">📚</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Library Clearance</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ offboarding.library_cleared_by }}</span>
+                            </div>
+                        </div>
+                        <button onclick="toggleClearance('library_cleared', !{{ offboarding.library_cleared|lower }})" id="btn-library_cleared" class="px-2.5 py-1 rounded-lg text-xs font-bold transition {% if offboarding.library_cleared %}bg-emerald-100 text-emerald-700 border border-emerald-300{% else %}bg-rose-100 text-rose-700 border border-rose-300{% endif %}">
+                            {% if offboarding.library_cleared %}<i class="fa-solid fa-check mr-1"></i>CLEARED{% else %}<i class="fa-solid fa-hourglass-start mr-1"></i>PENDING{% endif %}
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-600">{{ offboarding.library_remarks }}</p>
+                </div>
+
+                <!-- 2. Laboratory Clearance -->
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">🔬</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Laboratory Clearance</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ offboarding.lab_cleared_by }}</span>
+                            </div>
+                        </div>
+                        <button onclick="toggleClearance('lab_cleared', !{{ offboarding.lab_cleared|lower }})" id="btn-lab_cleared" class="px-2.5 py-1 rounded-lg text-xs font-bold transition {% if offboarding.lab_cleared %}bg-emerald-100 text-emerald-700 border border-emerald-300{% else %}bg-rose-100 text-rose-700 border border-rose-300{% endif %}">
+                            {% if offboarding.lab_cleared %}<i class="fa-solid fa-check mr-1"></i>CLEARED{% else %}<i class="fa-solid fa-hourglass-start mr-1"></i>PENDING{% endif %}
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-600">{{ offboarding.lab_remarks }}</p>
+                </div>
+
+                <!-- 3. IT Department Clearance -->
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">💻</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">IT Department Clearance</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ offboarding.it_cleared_by }}</span>
+                            </div>
+                        </div>
+                        <button onclick="toggleClearance('it_cleared', !{{ offboarding.it_cleared|lower }})" id="btn-it_cleared" class="px-2.5 py-1 rounded-lg text-xs font-bold transition {% if offboarding.it_cleared %}bg-emerald-100 text-emerald-700 border border-emerald-300{% else %}bg-rose-100 text-rose-700 border border-rose-300{% endif %}">
+                            {% if offboarding.it_cleared %}<i class="fa-solid fa-check mr-1"></i>CLEARED{% else %}<i class="fa-solid fa-hourglass-start mr-1"></i>PENDING{% endif %}
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-600">{{ offboarding.it_remarks }}</p>
+                </div>
+
+                <!-- 4. Stores Clearance -->
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">📦</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Stores & Equipment</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ offboarding.stores_cleared_by }}</span>
+                            </div>
+                        </div>
+                        <button onclick="toggleClearance('stores_cleared', !{{ offboarding.stores_cleared|lower }})" id="btn-stores_cleared" class="px-2.5 py-1 rounded-lg text-xs font-bold transition {% if offboarding.stores_cleared %}bg-emerald-100 text-emerald-700 border border-emerald-300{% else %}bg-rose-100 text-rose-700 border border-rose-300{% endif %}">
+                            {% if offboarding.stores_cleared %}<i class="fa-solid fa-check mr-1"></i>CLEARED{% else %}<i class="fa-solid fa-hourglass-start mr-1"></i>PENDING{% endif %}
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-600">{{ offboarding.stores_remarks }}</p>
+                </div>
+
+                <!-- 5. Assets & Security Clearance -->
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">🪪</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Assets & ID Clearance</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ offboarding.assets_cleared_by }}</span>
+                            </div>
+                        </div>
+                        <button onclick="toggleClearance('assets_cleared', !{{ offboarding.assets_cleared|lower }})" id="btn-assets_cleared" class="px-2.5 py-1 rounded-lg text-xs font-bold transition {% if offboarding.assets_cleared %}bg-emerald-100 text-emerald-700 border border-emerald-300{% else %}bg-rose-100 text-rose-700 border border-rose-300{% endif %}">
+                            {% if offboarding.assets_cleared %}<i class="fa-solid fa-check mr-1"></i>CLEARED{% else %}<i class="fa-solid fa-hourglass-start mr-1"></i>PENDING{% endif %}
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-600">{{ offboarding.assets_remarks }}</p>
+                </div>
+
+                <!-- 6. Accounts Clearance -->
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xl">💰</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Accounts & Dues</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ offboarding.accounts_cleared_by }}</span>
+                            </div>
+                        </div>
+                        <button onclick="toggleClearance('accounts_cleared', !{{ offboarding.accounts_cleared|lower }})" id="btn-accounts_cleared" class="px-2.5 py-1 rounded-lg text-xs font-bold transition {% if offboarding.accounts_cleared %}bg-emerald-100 text-emerald-700 border border-emerald-300{% else %}bg-rose-100 text-rose-700 border border-rose-300{% endif %}">
+                            {% if offboarding.accounts_cleared %}<i class="fa-solid fa-check mr-1"></i>CLEARED{% else %}<i class="fa-solid fa-hourglass-start mr-1"></i>PENDING{% endif %}
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-600">{{ offboarding.accounts_remarks }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 06-08 Steps: Final Settlement & Exit Documents -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800">06-08 Steps: HR Verification, Exit Completion & Exit Documents</h3>
+                    <p class="text-xs text-slate-500">Issue official Relieving Letter and Experience Certificate</p>
+                </div>
+                <button onclick="finalizeExitWorkflow()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center space-x-1.5 transition">
+                    <i class="fa-solid fa-file-signature"></i>
+                    <span>Finalize Exit & Issue Relieving Documents</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Relieving Order Box -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono font-bold text-blue-700">{{ offboarding.relieving_order_number }}</span>
+                        <span class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-[10px] font-bold">Relieving Order</span>
+                    </div>
+                    <h4 class="text-sm font-bold text-slate-800">Formal RNSIT Relieving Letter</h4>
+                    <p class="text-xs text-slate-500">Certifies completion of all department clearances and official relieving from the services of RNSIT.</p>
+                    <a href="/onboarding-offboarding/document/relieving/{{ employee.employee_id }}/" target="_blank" class="inline-flex items-center space-x-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">
+                        <i class="fa-solid fa-print"></i>
+                        <span>View & Print Relieving Letter</span>
+                    </a>
+                </div>
+
+                <!-- Experience Certificate Box -->
+                <div class="p-5 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono font-bold text-amber-700">{{ offboarding.experience_cert_number }}</span>
+                        <span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-[10px] font-bold">Experience Certificate</span>
+                    </div>
+                    <h4 class="text-sm font-bold text-slate-800">Official Service & Experience Certificate</h4>
+                    <p class="text-xs text-slate-500">Documents total service duration, designations held, academic contributions, and exemplary conduct.</p>
+                    <a href="/onboarding-offboarding/document/experience/{{ employee.employee_id }}/" target="_blank" class="inline-flex items-center space-x-1.5 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition">
+                        <i class="fa-solid fa-stamp"></i>
+                        <span>View & Print Experience Certificate</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        async function toggleClearance(field, newValue) {
+            try {
+                const res = await fetch('/onboarding-offboarding/api/clearance/{{ employee.employee_id }}/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ field: field, value: newValue })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (err) {
+                alert('Communication error: ' + err.message);
+            }
+        }
+
+        async function finalizeExitWorkflow() {
+            if (!confirm('Are you sure you want to finalize the exit for {{ employee.full_name }}? This will mark the employee as RELIEVED and stamp the final exit records.')) {
+                return;
+            }
+
+            try {
+                const res = await fetch('/onboarding-offboarding/api/finalize-exit/{{ employee.employee_id }}/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (err) {
+                alert('Communication error: ' + err.message);
+            }
+        }
+    </script>
+</body>
+</html>

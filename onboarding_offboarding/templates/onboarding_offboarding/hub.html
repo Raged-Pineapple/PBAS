@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNSIT HR E2E - Onboarding & Offboarding Lifecycle Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a' },
+                        rnsit: {
+                            blue: '#1d4ed8',
+                            dark: '#1e3a8a',
+                            gold: '#f59e0b',
+                            emerald: '#059669',
+                            slate: '#334155'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-16 custom-scrollbar">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-rnsit-dark text-white shadow-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-400 font-bold text-xl border border-white/20">
+                    <i class="fa-solid fa-users-gear"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-base sm:text-lg font-bold tracking-tight">RNS HR SYSTEM E2E</h1>
+                        <span class="px-2 py-0.5 text-[11px] font-semibold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 rounded-full">Entry - Exit Module</span>
+                    </div>
+                    <p class="text-xs text-slate-300">Complete Faculty Lifecycle — Onboarding, Master Directory & Offboarding Clearances</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Actions -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- Institution Badge -->
+                <div class="bg-white/10 border border-white/20 rounded-lg px-2.5 py-1 text-left hidden sm:block">
+                    <span class="text-[9px] uppercase tracking-wider text-slate-300 font-semibold block">INSTITUTION</span>
+                    <span class="text-xs font-bold text-amber-300">RNSIT Bangalore</span>
+                </div>
+
+                <!-- Back to Master Hub -->
+                <a href="/" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-semibold border border-white/20 flex items-center space-x-1.5 transition">
+                    <i class="fa-solid fa-house"></i>
+                    <span>All Portals</span>
+                </a>
+
+                <!-- User Role Pill -->
+                <div class="bg-amber-500/20 border border-amber-400/40 rounded-lg px-2.5 py-1 text-right">
+                    <span class="text-[9px] uppercase tracking-wider text-amber-300 font-semibold block">ROLE</span>
+                    <span class="text-xs font-bold text-white">{{ user_role }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-Module Navigation Ribbon -->
+        <div class="bg-slate-900 border-t border-slate-700/80 px-4 sm:px-8 py-2">
+            <div class="max-w-7xl mx-auto flex items-center justify-between text-xs overflow-x-auto">
+                <div class="flex items-center space-x-6 whitespace-nowrap">
+                    <button onclick="switchTab('tab-onboarding')" id="btn-tab-onboarding" class="tab-btn font-semibold text-amber-400 flex items-center space-x-2 border-b-2 border-amber-400 pb-1">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>01. 6-Step Onboarding (Entry)</span>
+                    </button>
+                    <button onclick="switchTab('tab-directory')" id="btn-tab-directory" class="tab-btn font-semibold text-slate-400 hover:text-white flex items-center space-x-2 pb-1 transition">
+                        <i class="fa-solid fa-id-card"></i>
+                        <span>02. Faculty Master Directory</span>
+                    </button>
+                    <button onclick="switchTab('tab-offboarding')" id="btn-tab-offboarding" class="tab-btn font-semibold text-slate-400 hover:text-white flex items-center space-x-2 pb-1 transition">
+                        <i class="fa-solid fa-person-walking-arrow-right"></i>
+                        <span>03. 8-Step Offboarding & 6 Clearances</span>
+                    </button>
+                    <button onclick="switchTab('tab-documents')" id="btn-tab-documents" class="tab-btn font-semibold text-slate-400 hover:text-white flex items-center space-x-2 pb-1 transition">
+                        <i class="fa-solid fa-certificate"></i>
+                        <span>04. Relieving & Experience Documents</span>
+                    </button>
+                </div>
+                <div class="hidden md:flex items-center space-x-2 text-slate-400">
+                    <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                    <span>E2E Enterprise Audit Ready</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Top Summary Metric Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex items-center space-x-3.5">
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Total Faculty</span>
+                    <span class="text-2xl font-black text-slate-800 font-mono">{{ total_count }}</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex items-center space-x-3.5">
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Active in Service</span>
+                    <span class="text-2xl font-black text-emerald-600 font-mono">{{ active_count }}</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex items-center space-x-3.5">
+                <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-spinner animate-spin"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">In Onboarding</span>
+                    <span class="text-2xl font-black text-amber-600 font-mono">{{ onboarding_count }}</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex items-center space-x-3.5">
+                <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-door-open"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Exit / Relieved</span>
+                    <span class="text-2xl font-black text-rose-600 font-mono">{{ exit_count }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 1: 6-STEP ONBOARDING WIZARD -->
+        <!-- ========================================== -->
+        <section id="tab-onboarding" class="tab-pane space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-slate-900 to-rnsit-dark px-6 py-4 text-white flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-base font-bold flex items-center space-x-2">
+                            <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center text-xs font-extrabold">1</span>
+                            <span>Employee Onboarding Process — 6-Step End-to-End Workflow</span>
+                        </h2>
+                        <p class="text-xs text-slate-300 mt-0.5">Directly implements Slide 8 of RNSIT Faculty Hackathon 2026 Problem Statement</p>
+                    </div>
+                    <span class="text-xs px-3 py-1 bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-lg font-mono">
+                        Workflow 01 → 06
+                    </span>
+                </div>
+
+                <!-- 6 Step Progression Bar -->
+                <div class="p-4 bg-slate-50 border-b border-slate-200 grid grid-cols-2 md:grid-cols-6 gap-2 text-center text-xs">
+                    <div class="p-2.5 bg-white rounded-xl border border-blue-200 shadow-sm">
+                        <div class="w-7 h-7 mx-auto rounded-full bg-blue-600 text-white font-bold flex items-center justify-center mb-1 text-xs">01</div>
+                        <div class="font-bold text-slate-800">Joining Report</div>
+                        <div class="text-[10px] text-slate-500">Appointment Order</div>
+                    </div>
+                    <div class="p-2.5 bg-white rounded-xl border border-blue-200 shadow-sm">
+                        <div class="w-7 h-7 mx-auto rounded-full bg-blue-600 text-white font-bold flex items-center justify-center mb-1 text-xs">02</div>
+                        <div class="font-bold text-slate-800">Personal & Edu</div>
+                        <div class="text-[10px] text-slate-500">Credentials & Profile</div>
+                    </div>
+                    <div class="p-2.5 bg-white rounded-xl border border-blue-200 shadow-sm">
+                        <div class="w-7 h-7 mx-auto rounded-full bg-blue-600 text-white font-bold flex items-center justify-center mb-1 text-xs">03</div>
+                        <div class="font-bold text-slate-800">Experience</div>
+                        <div class="text-[10px] text-slate-500">VTU Norms Verify</div>
+                    </div>
+                    <div class="p-2.5 bg-white rounded-xl border border-blue-200 shadow-sm">
+                        <div class="w-7 h-7 mx-auto rounded-full bg-blue-600 text-white font-bold flex items-center justify-center mb-1 text-xs">04</div>
+                        <div class="font-bold text-slate-800">Document Upload</div>
+                        <div class="text-[10px] text-slate-500">Digital HR Checks</div>
+                    </div>
+                    <div class="p-2.5 bg-white rounded-xl border border-blue-200 shadow-sm">
+                        <div class="w-7 h-7 mx-auto rounded-full bg-blue-600 text-white font-bold flex items-center justify-center mb-1 text-xs">05</div>
+                        <div class="font-bold text-slate-800">Employee ID</div>
+                        <div class="text-[10px] text-slate-500">Auto Code Gen</div>
+                    </div>
+                    <div class="p-2.5 bg-white rounded-xl border border-blue-200 shadow-sm">
+                        <div class="w-7 h-7 mx-auto rounded-full bg-blue-600 text-white font-bold flex items-center justify-center mb-1 text-xs">06</div>
+                        <div class="font-bold text-slate-800">Dept & Role</div>
+                        <div class="text-[10px] text-slate-500">Reporting Authority</div>
+                    </div>
+                </div>
+
+                <!-- Form Body -->
+                <form id="onboardingForm" onsubmit="submitOnboarding(event)" class="p-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                        <!-- Step 01 & 02: Personal & Contact -->
+                        <div class="space-y-4">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-blue-700 flex items-center space-x-1.5 pb-2 border-b border-slate-200">
+                                <i class="fa-solid fa-user-circle"></i>
+                                <span>Steps 01-02: Faculty Profile</span>
+                            </h3>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">First Name *</label>
+                                <input type="text" id="first_name" required placeholder="e.g. Dr. Ramesh" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Last Name *</label>
+                                <input type="text" id="last_name" required placeholder="e.g. Kumar" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Gender</label>
+                                    <select id="gender" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                        <option value="MALE">Male</option>
+                                        <option value="FEMALE" selected>Female</option>
+                                        <option value="OTHER">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Date of Joining</label>
+                                    <input type="date" id="date_of_joining" value="2026-11-14" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Official Email *</label>
+                                <input type="email" id="email" required placeholder="faculty.name@rnsit.ac.in" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+                                <input type="text" id="phone" value="+91 98450 12345" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg">
+                            </div>
+                        </div>
+
+                        <!-- Step 03: Qualifications & Experience -->
+                        <div class="space-y-4">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-700 flex items-center space-x-1.5 pb-2 border-b border-slate-200">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                                <span>Step 03: Academic & Experience</span>
+                            </h3>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Highest Qualification</label>
+                                <select id="highest_qualification" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                    <option value="Ph.D.">Ph.D. (Doctorate)</option>
+                                    <option value="M.Tech">M.Tech / M.E.</option>
+                                    <option value="B.E./B.Tech">B.E. / B.Tech</option>
+                                    <option value="Post-Doc">Post-Doctoral</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Specialization / Domain</label>
+                                <input type="text" id="specialization" value="Artificial Intelligence & Data Science" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">University / Institute</label>
+                                <input type="text" id="university" value="Visvesvaraya Technological University (VTU)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Teaching Exp (Yrs)</label>
+                                    <input type="number" step="0.5" id="teaching_exp" value="4.5" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Industry Exp (Yrs)</label>
+                                    <input type="number" step="0.5" id="industry_exp" value="1.5" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono">
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-[11px] text-emerald-800 flex items-start space-x-2">
+                                <i class="fa-solid fa-circle-check text-emerald-600 mt-0.5"></i>
+                                <span>Meets AICTE 2026 eligibility norms for Assistant Professor pay scale & cadre ratio.</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 04-06: Dept, Role, Salary & Documents -->
+                        <div class="space-y-4">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-amber-700 flex items-center space-x-1.5 pb-2 border-b border-slate-200">
+                                <i class="fa-solid fa-sitemap"></i>
+                                <span>Steps 04-06: Allocation & Checklists</span>
+                            </h3>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Target Department</label>
+                                <select id="department" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                    <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                                    <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
+                                    <option value="CSE (AI&ML)">CSE (AI&ML)</option>
+                                    <option value="CSE (Cyber Security)">CSE (Cyber Security)</option>
+                                    <option value="Information Science & Engineering">Information Science & Engineering</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Designation</label>
+                                    <select id="designation" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                                        <option value="Assistant Professor">Assistant Professor</option>
+                                        <option value="Associate Professor">Associate Professor</option>
+                                        <option value="Professor & Dean">Professor & Dean</option>
+                                        <option value="Lab Instructor">Lab Instructor</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Basic Pay (₹)</label>
+                                    <input type="number" id="basic_pay" value="57700" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Reporting Authority</label>
+                                <input type="text" id="reporting_authority" value="Dr. Kiran B. R. (HOD - CSE)" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg">
+                            </div>
+
+                            <!-- Document Upload Checklists -->
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-[11px]">
+                                <div class="font-bold text-slate-700 mb-1 flex items-center justify-between">
+                                    <span>Mandatory Document Checklists</span>
+                                    <span class="text-[10px] text-blue-600">Digital Archive</span>
+                                </div>
+                                <label class="flex items-center space-x-2 text-slate-600 cursor-pointer">
+                                    <input type="checkbox" checked class="rounded text-blue-600">
+                                    <span>Appointment Order & Signed Joining Report</span>
+                                </label>
+                                <label class="flex items-center space-x-2 text-slate-600 cursor-pointer">
+                                    <input type="checkbox" checked class="rounded text-blue-600">
+                                    <span>Degree Certificates & Transcripts (UG/PG/PhD)</span>
+                                </label>
+                                <label class="flex items-center space-x-2 text-slate-600 cursor-pointer">
+                                    <input type="checkbox" checked class="rounded text-blue-600">
+                                    <span>Government ID (Aadhaar & PAN)</span>
+                                </label>
+                                <label class="flex items-center space-x-2 text-slate-600 cursor-pointer">
+                                    <input type="checkbox" checked class="rounded text-blue-600">
+                                    <span>Bank Details / Cancelled Cheque</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Action Bar -->
+                    <div class="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                        <div class="text-xs text-slate-500 flex items-center space-x-2">
+                            <i class="fa-solid fa-fingerprint text-blue-600"></i>
+                            <span>Auto Employee ID format: <code class="bg-slate-100 px-1 py-0.5 rounded text-blue-700 font-bold">RNSIT-[DEPT]-[CODE]</code></span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button type="reset" class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold transition">
+                                Reset
+                            </button>
+                            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 flex items-center space-x-2 transition">
+                                <i class="fa-solid fa-check"></i>
+                                <span>Complete 6-Step Onboarding Enrollment</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: FACULTY MASTER DIRECTORY -->
+        <!-- ========================================== -->
+        <section id="tab-directory" class="tab-pane hidden space-y-4">
+            <!-- Filter Bar -->
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Institution</label>
+                        <select onchange="applyFilters()" id="filter-inst" class="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white font-medium">
+                            <option value="All">All Institutions</option>
+                            {% for inst in institutions %}
+                            <option value="{{ inst }}" {% if selected_institution == inst %}selected{% endif %}>{{ inst }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Department</label>
+                        <select onchange="applyFilters()" id="filter-dept" class="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white font-medium">
+                            <option value="All">All Departments</option>
+                            {% for d in departments %}
+                            <option value="{{ d }}" {% if selected_dept == d %}selected{% endif %}>{{ d }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Status</label>
+                        <select onchange="applyFilters()" id="filter-status" class="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white font-medium">
+                            <option value="All">All Statuses</option>
+                            <option value="ACTIVE" {% if selected_status == 'ACTIVE' %}selected{% endif %}>Active</option>
+                            <option value="ONBOARDING" {% if selected_status == 'ONBOARDING' %}selected{% endif %}>Onboarding</option>
+                            <option value="RELIEVED" {% if selected_status == 'RELIEVED' %}selected{% endif %}>Relieved</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-500">
+                    Showing <strong class="text-slate-800">{{ employees|length }}</strong> faculty records
+                </div>
+            </div>
+
+            <!-- Master Table -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100/80 text-slate-600 font-semibold uppercase tracking-wider text-[11px] border-b border-slate-200">
+                            <tr>
+                                <th class="p-3.5 pl-5">Employee ID & Name</th>
+                                <th class="p-3.5">Department</th>
+                                <th class="p-3.5">Designation</th>
+                                <th class="p-3.5">Joining Date</th>
+                                <th class="p-3.5">Status</th>
+                                <th class="p-3.5">Leave Balances</th>
+                                <th class="p-3.5 pr-5 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            {% for emp in employees %}
+                            <tr class="hover:bg-slate-50/70 transition">
+                                <td class="p-3.5 pl-5">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs">
+                                            {{ emp.first_name|slice:":1" }}{{ emp.last_name|slice:":1" }}
+                                        </div>
+                                        <div>
+                                            <a href="/onboarding-offboarding/employee/{{ emp.employee_id }}/" class="font-bold text-slate-800 hover:text-blue-600">
+                                                {{ emp.full_name }}
+                                            </a>
+                                            <span class="block font-mono text-[11px] text-slate-400">{{ emp.employee_id }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-3.5 text-slate-700 font-medium">{{ emp.department }}</td>
+                                <td class="p-3.5 text-slate-600">{{ emp.designation }}</td>
+                                <td class="p-3.5 text-slate-500 font-mono">{{ emp.date_of_joining|date:"d M Y" }}</td>
+                                <td class="p-3.5">
+                                    {% if emp.status == 'ACTIVE' %}
+                                    <span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold inline-flex items-center space-x-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        <span>Active</span>
+                                    </span>
+                                    {% elif emp.status == 'ONBOARDING' %}
+                                    <span class="px-2.5 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold inline-flex items-center space-x-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+                                        <span>Onboarding</span>
+                                    </span>
+                                    {% else %}
+                                    <span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold">
+                                        {{ emp.get_status_display }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="p-3.5">
+                                    <div class="flex items-center space-x-2 font-mono text-[11px]">
+                                        <span class="px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded border border-blue-200" title="Casual Leave Available">CL: {{ emp.cl_available|floatformat:0 }}</span>
+                                        <span class="px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded border border-purple-200" title="Earned Leave Available">EL: {{ emp.el_available|floatformat:0 }}</span>
+                                        <span class="px-1.5 py-0.5 bg-rose-50 text-rose-700 rounded border border-rose-200" title="Medical Leave Available">ML: {{ emp.ml_available|floatformat:0 }}</span>
+                                    </div>
+                                </td>
+                                <td class="p-3.5 pr-5 text-right whitespace-nowrap">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <a href="/onboarding-offboarding/employee/{{ emp.employee_id }}/" class="px-2.5 py-1 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 rounded-lg text-xs font-semibold transition" title="View Dossier">
+                                            <i class="fa-regular fa-eye"></i> Dossier
+                                        </a>
+                                        <a href="/onboarding-offboarding/offboarding/{{ emp.employee_id }}/" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-semibold transition" title="Initiate / View Exit">
+                                            <i class="fa-solid fa-door-open"></i> Exit
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="p-6 text-center text-slate-400">
+                                    No faculty records found for the selected filter criteria.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: 8-STEP OFFBOARDING & 6 CLEARANCES -->
+        <!-- ========================================== -->
+        <section id="tab-offboarding" class="tab-pane hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-rose-900 to-slate-900 px-6 py-4 text-white flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-base font-bold flex items-center space-x-2">
+                            <span class="w-6 h-6 rounded-full bg-rose-400 text-slate-900 flex items-center justify-center text-xs font-extrabold">2</span>
+                            <span>Employee Offboarding Process — 8-Step End-to-End Workflow</span>
+                        </h2>
+                        <p class="text-xs text-slate-300 mt-0.5">Directly implements Slide 9 of RNSIT Faculty Hackathon 2026 Problem Statement</p>
+                    </div>
+                    <span class="text-xs px-3 py-1 bg-rose-500/20 text-rose-300 border border-rose-400/30 rounded-lg font-mono">
+                        Workflow 01 → 08 + 6 Department Clearances
+                    </span>
+                    </div>
+
+                <!-- 8 Step Progression Visual Bar -->
+                <div class="p-4 bg-slate-50 border-b border-slate-200 grid grid-cols-2 md:grid-cols-8 gap-2 text-center text-xs">
+                    <div class="p-2 bg-white rounded-xl border border-slate-200">
+                        <div class="w-6 h-6 mx-auto rounded-full bg-rose-600 text-white font-bold flex items-center justify-center mb-1 text-[11px]">01</div>
+                        <div class="font-bold text-slate-800">Resignation</div>
+                        <div class="text-[9px] text-slate-500">Employee Submit</div>
+                    </div>
+                    <div class="p-2 bg-white rounded-xl border border-slate-200">
+                        <div class="w-6 h-6 mx-auto rounded-full bg-rose-600 text-white font-bold flex items-center justify-center mb-1 text-[11px]">02</div>
+                        <div class="font-bold text-slate-800">HoD Review</div>
+                        <div class="text-[9px] text-slate-500">Handover Plan</div>
+                    </div>
+                    <div class="p-2 bg-white rounded-xl border border-slate-200">
+                        <div class="w-6 h-6 mx-auto rounded-full bg-rose-600 text-white font-bold flex items-center justify-center mb-1 text-[11px]">03</div>
+                        <div class="font-bold text-slate-800">Principal</div>
+                        <div class="text-[9px] text-slate-500">Management OK</div>
+                    </div>
+                    <div class="p-2 bg-white rounded-xl border border-slate-200">
+                        <div class="w-6 h-6 mx-auto rounded-full bg-rose-600 text-white font-bold flex items-center justify-center mb-1 text-[11px]">04</div>
+                        <div class="font-bold text-slate-800">Notice Period</div>
+                        <div class="text-[9px] text-slate-500">Days Monitoring</div>
+                    </div>
+                    <div class="p-2 bg-white rounded-xl border border-slate-200">
+                        <div class="w-6 h-6 mx-auto rounded-full bg-rose-600 text-white font-bold flex items-center justify-center mb-1 text-[11px]">05</div>
+                        <div class="font-bold text-slate-800">6 Clearances</div>
+                        <div class="text-[9px] text-slate-500">Dept No-Dues</div>
+                    </div>
+                    <div class="p-2 bg-white rounded-xl border border-slate-200">
+                        <div class="w-6 h-6 mx-auto rounded-full bg-rose-600 text-white font-bold flex items-center justify-center mb-1 text-[11px]">06</div>
+                        <div class="font-bold text-slate-800">HR Verify</div>
+                        <div class="text-[9px] text-slate-500">Settlement Check</div>
+                    </div>
+                    <div class="p-2 bg-white rounded-xl border border-slate-200">
+                        <div class="w-6 h-6 mx-auto rounded-full bg-rose-600 text-white font-bold flex items-center justify-center mb-1 text-[11px]">07</div>
+                        <div class="font-bold text-slate-800">Exit Done</div>
+                        <div class="text-[9px] text-slate-500">Access Closed</div>
+                    </div>
+                    <div class="p-2 bg-white rounded-xl border border-slate-200">
+                        <div class="w-6 h-6 mx-auto rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center mb-1 text-[11px]">08</div>
+                        <div class="font-bold text-slate-800">Exit Docs</div>
+                        <div class="text-[9px] text-emerald-600 font-bold">Relieving/Exp</div>
+                    </div>
+                </div>
+
+                <!-- Active Offboarding Cases -->
+                <div class="p-6 space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center space-x-2">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Offboarding Requests in Pipeline</span>
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for req in offboarding_requests %}
+                        <div class="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition space-y-4">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <span class="text-xs font-mono text-slate-400 block">{{ req.employee.employee_id }}</span>
+                                    <h4 class="text-sm font-bold text-slate-800">{{ req.employee.full_name }}</h4>
+                                    <p class="text-xs text-slate-500">{{ req.employee.designation }} • {{ req.employee.department }}</p>
+                                </div>
+                                <span class="px-2.5 py-1 bg-rose-100 text-rose-700 rounded-full text-[10px] font-bold">
+                                    {{ req.get_status_display }}
+                                </span>
+                            </div>
+
+                            <!-- 6 Department Clearances Badges -->
+                            <div class="p-3 bg-slate-50 rounded-xl space-y-2">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-bold text-slate-700">05 Department Clearances</span>
+                                    <span class="font-mono text-blue-600 font-bold">{{ req.clearances_count }} / 6 Cleared</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-1.5 text-[10px]">
+                                    <span class="px-2 py-1 rounded text-center font-semibold {% if req.library_cleared %}bg-emerald-100 text-emerald-700{% else %}bg-slate-200 text-slate-500{% endif %}">
+                                        📚 Library
+                                    </span>
+                                    <span class="px-2 py-1 rounded text-center font-semibold {% if req.lab_cleared %}bg-emerald-100 text-emerald-700{% else %}bg-slate-200 text-slate-500{% endif %}">
+                                        🔬 Lab
+                                    </span>
+                                    <span class="px-2 py-1 rounded text-center font-semibold {% if req.it_cleared %}bg-emerald-100 text-emerald-700{% else %}bg-slate-200 text-slate-500{% endif %}">
+                                        💻 IT
+                                    </span>
+                                    <span class="px-2 py-1 rounded text-center font-semibold {% if req.stores_cleared %}bg-emerald-100 text-emerald-700{% else %}bg-slate-200 text-slate-500{% endif %}">
+                                        📦 Stores
+                                    </span>
+                                    <span class="px-2 py-1 rounded text-center font-semibold {% if req.assets_cleared %}bg-emerald-100 text-emerald-700{% else %}bg-slate-200 text-slate-500{% endif %}">
+                                        🪪 Assets
+                                    </span>
+                                    <span class="px-2 py-1 rounded text-center font-semibold {% if req.accounts_cleared %}bg-emerald-100 text-emerald-700{% else %}bg-slate-200 text-slate-500{% endif %}">
+                                        💰 Accounts
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                                <a href="/onboarding-offboarding/offboarding/{{ req.employee.employee_id }}/" class="text-blue-600 font-bold hover:underline flex items-center space-x-1">
+                                    <span>Manage Clearances & Workflow</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                </a>
+                                {% if req.is_exit_completed %}
+                                <div class="flex items-center space-x-2">
+                                    <a href="/onboarding-offboarding/document/relieving/{{ req.employee.employee_id }}/" target="_blank" class="px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded text-[11px] font-bold border border-emerald-200">
+                                        Relieving
+                                    </a>
+                                    <a href="/onboarding-offboarding/document/experience/{{ req.employee.employee_id }}/" target="_blank" class="px-2 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded text-[11px] font-bold border border-blue-200">
+                                        Experience
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-span-2 p-6 text-center text-slate-400 bg-slate-50 rounded-xl">
+                            No faculty members currently in offboarding workflow.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: RELIEVING & EXPERIENCE CERTIFICATES -->
+        <!-- ========================================== -->
+        <section id="tab-documents" class="tab-pane hidden space-y-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800">Generated Relieving Orders & Experience Certificates</h3>
+                    <p class="text-xs text-slate-500">Official RNSIT Exit Documentation (Slide 9 - Step 08 Issue Exit Documents)</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for req in offboarding_requests %}
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-mono text-slate-400">{{ req.relieving_order_number }}</span>
+                            <h4 class="text-xs font-bold text-slate-800">{{ req.employee.full_name }}</h4>
+                            <p class="text-[11px] text-slate-500">{{ req.employee.designation }} • Conduct: <span class="text-emerald-600 font-semibold">{{ req.conduct_assessment }}</span></p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <a href="/onboarding-offboarding/document/relieving/{{ req.employee.employee_id }}/" target="_blank" class="px-3 py-1.5 bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-file-contract"></i>
+                                <span>Relieving Letter</span>
+                            </a>
+                            <a href="/onboarding-offboarding/document/experience/{{ req.employee.employee_id }}/" target="_blank" class="px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-700 border border-blue-300 rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-stamp"></i>
+                                <span>Experience Cert</span>
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-xs text-slate-400">No exit documents generated yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript Interactions -->
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-amber-400', 'border-b-2', 'border-amber-400');
+                btn.classList.add('text-slate-400');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const btn = document.getElementById('btn-' + tabId);
+            if (btn) {
+                btn.classList.add('text-amber-400', 'border-b-2', 'border-amber-400');
+                btn.classList.remove('text-slate-400');
+            }
+        }
+
+        function applyFilters() {
+            const inst = document.getElementById('filter-inst').value;
+            const dept = document.getElementById('filter-dept').value;
+            const status = document.getElementById('filter-status').value;
+            window.location.href = `/onboarding-offboarding/?institution=${encodeURIComponent(inst)}&department=${encodeURIComponent(dept)}&status=${encodeURIComponent(status)}`;
+        }
+
+        async function submitOnboarding(e) {
+            e.preventDefault();
+            const payload = {
+                first_name: document.getElementById('first_name').value,
+                last_name: document.getElementById('last_name').value,
+                gender: document.getElementById('gender').value,
+                date_of_joining: document.getElementById('date_of_joining').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                highest_qualification: document.getElementById('highest_qualification').value,
+                specialization: document.getElementById('specialization').value,
+                university: document.getElementById('university').value,
+                teaching_exp: document.getElementById('teaching_exp').value,
+                industry_exp: document.getElementById('industry_exp').value,
+                department: document.getElementById('department').value,
+                designation: document.getElementById('designation').value,
+                basic_pay: document.getElementById('basic_pay').value,
+                reporting_authority: document.getElementById('reporting_authority').value,
+            };
+
+            try {
+                const res = await fetch('/onboarding-offboarding/api/create/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert(`✅ SUCCESS!\n\nFaculty: ${result.name}\nGenerated Employee ID: ${result.employee_id}\n\n6-Step Onboarding initialized in RNS HR Master Database.`);
+                    window.location.href = `/onboarding-offboarding/employee/${result.employee_id}/`;
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (err) {
+                alert('Server communication error: ' + err.message);
+            }
+        }
+    </script>
+</body>
+</html>

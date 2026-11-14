@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNSIT Salary Calculator & Monthly Payroll Slip System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a' },
+                        rnsit: {
+                            blue: '#1d4ed8',
+                            dark: '#1e3a8a',
+                            gold: '#f59e0b',
+                            emerald: '#059669',
+                            slate: '#334155'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-16">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-rnsit-dark text-white shadow-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-400 font-bold text-xl border border-white/20">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-base sm:text-lg font-bold tracking-tight">RNS HR SYSTEM E2E</h1>
+                        <span class="px-2 py-0.5 text-[11px] font-semibold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 rounded-full">Salary Calculator & Pay Slip</span>
+                    </div>
+                    <p class="text-xs text-slate-300">Monthly Compensation Engine, Leave-Linked LOP Deductions & Self-Service Download</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <a href="/" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-semibold border border-white/20 flex items-center space-x-1.5 transition">
+                    <i class="fa-solid fa-house"></i>
+                    <span>All Portals</span>
+                </a>
+                <div class="bg-amber-500/20 border border-amber-400/40 rounded-lg px-2.5 py-1 text-right">
+                    <span class="text-[9px] uppercase tracking-wider text-amber-300 font-semibold block">ROLE</span>
+                    <span class="text-xs font-bold text-white">{{ user_role }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sticky Payroll Overview Ribbon -->
+        <div class="bg-slate-900 border-t border-slate-700/80 px-4 sm:px-8 py-2.5">
+            <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex items-center space-x-2 text-slate-300">
+                    <i class="fa-solid fa-building-columns text-emerald-400"></i>
+                    <span>Current Disbursement Cycle: <strong class="text-white font-mono">November 2026</strong> (All RNS Institutions)</span>
+                </div>
+                <div class="flex items-center space-x-4 font-mono">
+                    <span class="text-slate-400">Total Net Payroll: <strong class="text-emerald-400 text-sm">₹{{ total_payroll|floatformat:2 }}</strong></span>
+                    <span class="text-slate-400">Statutory Deductions: <strong class="text-rose-400">₹{{ total_deductions_sum|floatformat:2 }}</strong></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Slide 6: Salary Calculation Workflow Banner -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center space-x-2">
+                    <i class="fa-solid fa-calculator text-blue-600"></i>
+                    <span>Monthly Salary Calculation Architecture (Slide 6 & 7 — RNSIT Problem Statement)</span>
+                </h3>
+                <span class="text-[11px] font-mono text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                    Formula: Gross = Basic + DA + HRA + Allowances − LOP Deductions
+                </span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-[10px] text-slate-500 uppercase tracking-wider block font-semibold">1. Basic Pay</span>
+                    <strong class="text-slate-800">Pay Matrix Scale</strong>
+                    <span class="block text-[10px] text-slate-400 mt-0.5">Approved consolidated</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-[10px] text-slate-500 uppercase tracking-wider block font-semibold">2. Dearness (DA)</span>
+                    <strong class="text-slate-800">50% of Basic</strong>
+                    <span class="block text-[10px] text-slate-400 mt-0.5">Applicable standard</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-[10px] text-slate-500 uppercase tracking-wider block font-semibold">3. House Rent (HRA)</span>
+                    <strong class="text-slate-800">20% of Basic</strong>
+                    <span class="block text-[10px] text-slate-400 mt-0.5">Subject to eligibility</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-[10px] text-slate-500 uppercase tracking-wider block font-semibold">4. Transport Allowance</span>
+                    <strong class="text-slate-800">₹3,600 Flat</strong>
+                    <span class="block text-[10px] text-slate-400 mt-0.5">Approved academic travel</span>
+                </div>
+                <div class="p-3 bg-rose-50 rounded-xl border border-rose-200">
+                    <span class="text-[10px] text-rose-600 uppercase tracking-wider block font-semibold">5. LOP Deduction</span>
+                    <strong class="text-rose-700">Leave Linked</strong>
+                    <span class="block text-[10px] text-rose-500 mt-0.5">When CL / credit exceeds</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- INTERACTIVE SALARY CALCULATOR SANDBOX -->
+        <!-- ========================================== -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Controls (Left: 7 Cols) -->
+            <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5">
+                <div class="pb-3 border-b border-slate-200 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800">Live Compensation Calculator</h3>
+                        <p class="text-xs text-slate-500">Simulate earnings, allowances, statutory deductions, and LOP effects</p>
+                    </div>
+                    <button onclick="resetDefaults()" class="text-xs text-blue-600 hover:underline font-semibold">
+                        Reset to Slide 7 Values
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Basic Pay (₹) *</label>
+                        <input type="number" id="calc_basic" value="57700" oninput="runSalaryCalc()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">Assistant Prof Pay Level 10</span>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Dearness Allowance (DA %)</label>
+                        <input type="number" id="calc_da" value="50" oninput="runSalaryCalc()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono">
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">Assumed 50%</span>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">House Rent Allowance (HRA %)</label>
+                        <input type="number" id="calc_hra" value="20" oninput="runSalaryCalc()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono">
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">Assumed 20% (Bangalore Tier-1)</span>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Transport Allowance (₹)</label>
+                        <input type="number" id="calc_transport" value="3600" oninput="runSalaryCalc()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono">
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">Fixed conveyance</span>
+                    </div>
+                </div>
+
+                <!-- LOP Slider: Leave-Linked Deduction (Slide 6) -->
+                <div class="p-4 bg-rose-50/60 rounded-xl border border-rose-200 space-y-2 text-xs">
+                    <div class="flex items-center justify-between">
+                        <label class="font-bold text-rose-800 flex items-center space-x-1.5">
+                            <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+                            <span>Loss of Pay (LOP) Days Deduction:</span>
+                        </label>
+                        <span id="disp_lop_days" class="font-mono font-bold text-rose-700 text-sm">0 Days</span>
+                    </div>
+                    <input type="range" id="calc_lop_days" min="0" max="15" step="0.5" value="0" oninput="runSalaryCalc()" class="w-full accent-rose-600 cursor-pointer">
+                    <div class="flex items-center justify-between text-[10px] text-rose-600">
+                        <span>0 Days (Full Month)</span>
+                        <span id="disp_lop_deduction" class="font-mono font-bold">Deduction: ₹0.00</span>
+                        <span>15 Days LOP</span>
+                    </div>
+                </div>
+
+                <!-- Statutory Deductions Controls -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Employee PF (₹)</label>
+                        <input type="number" id="calc_pf" value="6924" oninput="runSalaryCalc()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono">
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">Slide 7: ₹6,924</span>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Professional Tax (₹)</label>
+                        <input type="number" id="calc_pt" value="200" oninput="runSalaryCalc()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono">
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">Karnataka PT</span>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">TDS / Income Tax (₹)</label>
+                        <input type="number" id="calc_tds" value="2000" oninput="runSalaryCalc()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg font-mono">
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">Slide 7: ₹2,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Calculation Breakdown Card (Right: 5 Cols - Slide 7 Matcher) -->
+            <div class="lg:col-span-5 bg-gradient-to-br from-slate-900 via-navy-900 to-slate-800 text-white rounded-2xl shadow-xl border border-slate-700 p-6 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+                    <div>
+                        <h4 class="text-xs uppercase tracking-wider text-amber-400 font-bold">Slide 7 Monthly Calculation</h4>
+                        <span class="text-xs text-slate-300 font-medium">Auto-generated monthly Salary Slip breakdown</span>
+                    </div>
+                    <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded text-[10px] font-mono font-bold">
+                        Verified Rule
+                    </span>
+                </div>
+
+                <div class="space-y-2 text-xs font-mono">
+                    <div class="flex items-center justify-between text-slate-300">
+                        <span>Basic pay</span>
+                        <span id="res_basic" class="font-bold text-white">₹57,700.00</span>
+                    </div>
+                    <div class="flex items-center justify-between text-slate-300">
+                        <span>DA (assumed 50%)</span>
+                        <span id="res_da" class="font-bold text-white">₹28,850.00</span>
+                    </div>
+                    <div class="flex items-center justify-between text-slate-300">
+                        <span>HRA (assumed 20%)</span>
+                        <span id="res_hra" class="font-bold text-white">₹11,540.00</span>
+                    </div>
+                    <div class="flex items-center justify-between text-slate-300">
+                        <span>Transport allowance</span>
+                        <span id="res_transport" class="font-bold text-white">₹3,600.00</span>
+                    </div>
+                    <div id="row_lop" class="hidden flex items-center justify-between text-rose-400 font-semibold">
+                        <span>Less: LOP Deduction</span>
+                        <span id="res_lop">-₹0.00</span>
+                    </div>
+
+                    <!-- Gross Earnings -->
+                    <div class="pt-2 border-t border-slate-700 flex items-center justify-between text-amber-300 font-bold text-sm">
+                        <span>Gross earnings</span>
+                        <span id="res_gross">₹1,01,690.00</span>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-700 space-y-1.5 text-xs font-mono">
+                    <span class="text-[10px] uppercase tracking-wider text-slate-400 block font-semibold">Deductions</span>
+                    <div class="flex items-center justify-between text-slate-300">
+                        <span>Employee PF</span>
+                        <span id="res_pf" class="text-rose-300">₹6,924.00</span>
+                    </div>
+                    <div class="flex items-center justify-between text-slate-300">
+                        <span>Professional tax</span>
+                        <span id="res_pt" class="text-rose-300">₹200.00</span>
+                    </div>
+                    <div class="flex items-center justify-between text-slate-300">
+                        <span>TDS</span>
+                        <span id="res_tds" class="text-rose-300">₹2,000.00</span>
+                    </div>
+                    <div class="flex items-center justify-between text-rose-400 font-bold">
+                        <span>Total deductions</span>
+                        <span id="res_deductions">₹9,124.00</span>
+                    </div>
+                </div>
+
+                <!-- Final Net Salary (Slide 7: ₹92,566) -->
+                <div class="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl space-y-1">
+                    <span class="text-[10px] uppercase tracking-wider text-emerald-400 block font-bold">Net Salary (Take Home)</span>
+                    <div class="text-2xl font-black text-emerald-400 font-mono" id="res_net">
+                        ₹92,566.00
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-sans italic">
+                        The salary slip will be generated in employee login.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PUBLISHED MONTHLY SALARY SLIPS TABLE -->
+        <!-- ========================================== -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 bg-slate-100/70 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800">Faculty Monthly Salary Slips (November 2026)</h3>
+                    <p class="text-xs text-slate-500">Official RNSIT pay registers with self-service download links</p>
+                </div>
+                <span class="text-xs px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg font-mono font-bold">
+                    {{ slips|length }} Payslips Ready
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 text-slate-600 font-semibold uppercase text-[10px] border-b border-slate-200">
+                        <tr>
+                            <th class="p-3.5 pl-6">Faculty Member</th>
+                            <th class="p-3.5">Department</th>
+                            <th class="p-3.5 font-mono">Basic Pay</th>
+                            <th class="p-3.5 font-mono">DA (50%)</th>
+                            <th class="p-3.5 font-mono">HRA (20%)</th>
+                            <th class="p-3.5 font-mono">Gross Earnings</th>
+                            <th class="p-3.5 font-mono text-rose-600">Deductions</th>
+                            <th class="p-3.5 font-mono font-bold text-emerald-700">Net Take Home</th>
+                            <th class="p-3.5 pr-6 text-right">Self-Service Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-mono">
+                        {% for s in slips %}
+                        <tr class="hover:bg-slate-50/70 transition font-sans">
+                            <td class="p-3.5 pl-6">
+                                <div class="font-bold text-slate-800">{{ s.employee.full_name }}</div>
+                                <span class="font-mono text-[11px] text-slate-400">{{ s.employee.employee_id }}</span>
+                            </td>
+                            <td class="p-3.5 text-slate-600">{{ s.employee.department }}</td>
+                            <td class="p-3.5 font-mono">₹{{ s.basic_pay|floatformat:0 }}</td>
+                            <td class="p-3.5 font-mono">₹{{ s.da_amount|floatformat:0 }}</td>
+                            <td class="p-3.5 font-mono">₹{{ s.hra_amount|floatformat:0 }}</td>
+                            <td class="p-3.5 font-mono font-bold text-slate-800">₹{{ s.gross_earnings|floatformat:0 }}</td>
+                            <td class="p-3.5 font-mono text-rose-600">₹{{ s.total_deductions|floatformat:0 }}</td>
+                            <td class="p-3.5 font-mono font-bold text-emerald-700 text-sm">₹{{ s.net_salary|floatformat:0 }}</td>
+                            <td class="p-3.5 pr-6 text-right whitespace-nowrap">
+                                <a href="/salary/payslip/{{ s.id }}/" target="_blank" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 rounded-lg text-xs font-bold border border-blue-200 transition inline-flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-receipt"></i>
+                                    <span>Download Pay Slip</span>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="p-6 text-center text-slate-400">No salary slips generated yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JavaScript Live Engine -->
+    <script>
+        function runSalaryCalc() {
+            const basic = parseFloat(document.getElementById('calc_basic').value) || 0;
+            const daPct = parseFloat(document.getElementById('calc_da').value) || 0;
+            const hraPct = parseFloat(document.getElementById('calc_hra').value) || 0;
+            const transport = parseFloat(document.getElementById('calc_transport').value) || 0;
+            const lopDays = parseFloat(document.getElementById('calc_lop_days').value) || 0;
+            const pf = parseFloat(document.getElementById('calc_pf').value) || 0;
+            const pt = parseFloat(document.getElementById('calc_pt').value) || 0;
+            const tds = parseFloat(document.getElementById('calc_tds').value) || 0;
+
+            const da = Math.round(basic * (daPct / 100));
+            const hra = Math.round(basic * (hraPct / 100));
+            const daily = basic / 30.0;
+            const lopDeduction = Math.round(daily * lopDays);
+            const gross = Math.round((basic + da + hra + transport) - lopDeduction);
+            const deductions = Math.round(pf + pt + tds);
+            const net = Math.round(gross - deductions);
+
+            // Update UI elements
+            document.getElementById('disp_lop_days').innerText = `${lopDays} Day(s)`;
+            document.getElementById('disp_lop_deduction').innerText = `Deduction: ₹${lopDeduction.toLocaleString('en-IN')}.00`;
+
+            document.getElementById('res_basic').innerText = `₹${basic.toLocaleString('en-IN')}.00`;
+            document.getElementById('res_da').innerText = `₹${da.toLocaleString('en-IN')}.00`;
+            document.getElementById('res_hra').innerText = `₹${hra.toLocaleString('en-IN')}.00`;
+            document.getElementById('res_transport').innerText = `₹${transport.toLocaleString('en-IN')}.00`;
+
+            if (lopDays > 0) {
+                document.getElementById('row_lop').classList.remove('hidden');
+                document.getElementById('res_lop').innerText = `-₹${lopDeduction.toLocaleString('en-IN')}.00`;
+            } else {
+                document.getElementById('row_lop').classList.add('hidden');
+            }
+
+            document.getElementById('res_gross').innerText = `₹${gross.toLocaleString('en-IN')}.00`;
+            document.getElementById('res_pf').innerText = `₹${pf.toLocaleString('en-IN')}.00`;
+            document.getElementById('res_pt').innerText = `₹${pt.toLocaleString('en-IN')}.00`;
+            document.getElementById('res_tds').innerText = `₹${tds.toLocaleString('en-IN')}.00`;
+            document.getElementById('res_deductions').innerText = `₹${deductions.toLocaleString('en-IN')}.00`;
+            document.getElementById('res_net').innerText = `₹${net.toLocaleString('en-IN')}.00`;
+        }
+
+        function resetDefaults() {
+            document.getElementById('calc_basic').value = 57700;
+            document.getElementById('calc_da').value = 50;
+            document.getElementById('calc_hra').value = 20;
+            document.getElementById('calc_transport').value = 3600;
+            document.getElementById('calc_lop_days').value = 0;
+            document.getElementById('calc_pf').value = 6924;
+            document.getElementById('calc_pt').value = 200;
+            document.getElementById('calc_tds').value = 2000;
+            runSalaryCalc();
+        }
+
+        // Initialize on load
+        window.onload = runSalaryCalc;
+    </script>
+</body>
+</html>

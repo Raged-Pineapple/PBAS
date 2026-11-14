@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNS HR System E2E — Unified Digital HR Portal (TechTrinity | RNSIT 2026)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a' },
+                        rnsit: {
+                            blue: '#1d4ed8',
+                            dark: '#1e3a8a',
+                            gold: '#f59e0b',
+                            emerald: '#059669',
+                            slate: '#334155'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+
+        .portal-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .portal-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .gradient-mesh {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+        }
+
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .pulse-soft { animation: pulse-soft 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+</head>
+<body class="bg-navy-900 text-slate-100 font-sans min-h-screen custom-scrollbar">
+
+    <!-- ===================================================== -->
+    <!-- TOP GLOBAL HEADER + ROLE & INSTITUTION QUICK SWITCHER -->
+    <!-- ===================================================== -->
+    <header class="bg-rnsit-dark shadow-2xl border-b border-blue-900/50 sticky top-0 z-50">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+
+            <!-- Brand -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 text-xl font-black">
+                    <i class="fa-solid fa-landmark"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-sm sm:text-base font-black tracking-tight text-white">RNS HR SYSTEM <span class="text-amber-400">E2E</span></h1>
+                        <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-full">TechTrinity 2026</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400">Complete Faculty Entry-to-Exit Digital Platform | RNS Educational Institutions</p>
+                </div>
+            </div>
+
+            <!-- Quick Controls Row -->
+            <div class="flex items-center flex-wrap gap-2">
+
+                <!-- Institution Selector -->
+                <div class="flex flex-col">
+                    <label class="text-[9px] uppercase tracking-wider text-slate-500 font-semibold mb-0.5">Institution</label>
+                    <select id="inst-switcher" onchange="quickSwitch('institution', this.value)" class="text-xs px-2.5 py-1.5 bg-slate-800 border border-slate-600 rounded-lg text-amber-300 font-semibold focus:outline-none focus:ring-1 focus:ring-amber-400">
+                        {% for inst in institutions %}
+                        <option value="{{ inst }}" {% if active_inst == inst %}selected{% endif %}>{{ inst }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Role Quick Switcher -->
+                <div class="flex flex-col">
+                    <label class="text-[9px] uppercase tracking-wider text-slate-500 font-semibold mb-0.5">View As Role</label>
+                    <select id="role-switcher" onchange="quickSwitch('role', this.value)" class="text-xs px-2.5 py-1.5 bg-slate-800 border border-slate-600 rounded-lg text-white font-semibold focus:outline-none focus:ring-1 focus:ring-blue-400">
+                        {% for r in roles %}
+                        <option value="{{ r.code }}" {% if active_role == r.code %}selected{% endif %}>{{ r.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Current User Pill -->
+                <div class="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-left">
+                    <span class="text-[9px] uppercase tracking-wider text-slate-400 font-semibold block">Signed In As</span>
+                    <span class="text-xs font-bold text-white">{{ user_name|default:current_employee.full_name }}</span>
+                </div>
+
+                <!-- Sign Out -->
+                <a href="/logout/" class="px-3 py-1.5 bg-rose-600/80 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 shadow-sm shadow-rose-900/30" title="Sign Out">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================================================== -->
+    <!-- HERO SECTION: PROBLEM STATEMENT ALIGNMENT             -->
+    <!-- ===================================================== -->
+    <section class="gradient-mesh border-b border-blue-900/50">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+            <div class="max-w-4xl mx-auto text-center space-y-5">
+                <div class="inline-flex items-center space-x-2 px-4 py-1.5 bg-amber-400/10 border border-amber-400/30 rounded-full text-amber-300 text-xs font-semibold tracking-wider">
+                    <i class="fa-solid fa-trophy text-amber-400"></i>
+                    <span>RNSIT FACULTY HACKATHON 2026 · PROBLEM STATEMENT 2 · CATEGORY: SOFTWARE</span>
+                </div>
+
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
+                    RNS HR System<br><span class="text-amber-400">Entry — Exit</span> (E2E)
+                </h2>
+
+                <p class="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                    A unified digital platform integrating <strong class="text-white">4 interconnected HR portals</strong> for <strong class="text-amber-300">all RNS Educational Institutions</strong> —
+                    covering the complete faculty lifecycle from first-day onboarding to final exit settlement.
+                </p>
+
+                <!-- Team: TechTrinity -->
+                <div class="flex flex-wrap justify-center gap-2 pt-2">
+                    {% for member in team_members %}
+                    <div class="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-slate-300 hover:bg-white/10 transition">
+                        <span class="font-semibold text-white">{{ member.name }}</span>
+                        <span class="text-slate-500 mx-1">•</span>
+                        <span class="text-slate-400 text-[11px]">{{ member.dept }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- LIVE METRICS STAT BAR                                 -->
+    <!-- ===================================================== -->
+    <div class="bg-slate-800/60 border-b border-slate-700/50 backdrop-blur">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 text-center text-xs">
+                <div>
+                    <span class="text-slate-500 uppercase tracking-wider text-[10px] font-semibold block mb-1">Total Faculty</span>
+                    <span class="text-2xl font-black text-white font-mono">{{ total_faculty }}</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 uppercase tracking-wider text-[10px] font-semibold block mb-1">Active in Service</span>
+                    <span class="text-2xl font-black text-emerald-400 font-mono">{{ active_faculty }}</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 uppercase tracking-wider text-[10px] font-semibold block mb-1">In Onboarding</span>
+                    <span class="text-2xl font-black text-amber-400 font-mono">{{ onboarding_faculty }}</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 uppercase tracking-wider text-[10px] font-semibold block mb-1">Exited / Relieved</span>
+                    <span class="text-2xl font-black text-rose-400 font-mono">{{ exit_faculty }}</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 uppercase tracking-wider text-[10px] font-semibold block mb-1">Leaves Pending</span>
+                    <span class="text-2xl font-black text-amber-300 font-mono">{{ pending_leaves }}</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 uppercase tracking-wider text-[10px] font-semibold block mb-1">Leaves Approved</span>
+                    <span class="text-2xl font-black text-blue-300 font-mono">{{ total_approved_leaves }}</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 uppercase tracking-wider text-[10px] font-semibold block mb-1">Monthly Payroll</span>
+                    <span class="text-sm font-black text-emerald-400 font-mono leading-tight block">₹{{ total_payroll_val|floatformat:0 }}</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 uppercase tracking-wider text-[10px] font-semibold block mb-1">PBAS Submissions</span>
+                    <span class="text-2xl font-black text-purple-400 font-mono">{{ pbas_submissions_count }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- MAIN: 4 PORTAL CARDS + INTEGRATION FLOW               -->
+    <!-- ===================================================== -->
+    <main class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+
+        <!-- ===================================================== -->
+        <!-- ROLE-SPECIFIC WORKSPACE DESK                          -->
+        <!-- ===================================================== -->
+        {% if active_role == 'FACULTY' %}
+        <div class="bg-gradient-to-r from-blue-950/70 via-slate-900 to-slate-900 rounded-3xl border-2 border-blue-500/40 p-6 sm:p-8 shadow-2xl shadow-blue-950/50 space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-blue-800/40">
+                <div class="space-y-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                            <i class="fa-solid fa-chalkboard-user mr-1"></i> Faculty Member View
+                        </span>
+                        <span class="text-xs text-slate-400 font-mono">ID: {{ current_employee.employee_id }}</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-white">Welcome back, <span class="text-blue-300">{{ current_employee.full_name }}</span></h3>
+                    <p class="text-xs text-slate-300">Department of {{ current_employee.department }} · Assistant Professor Grade Scale</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="px-3 py-1 bg-emerald-950/70 text-emerald-300 border border-emerald-600/50 rounded-xl text-xs font-bold font-mono">
+                        <i class="fa-solid fa-circle-check text-emerald-400 mr-1.5"></i>Status: Active in Service
+                    </span>
+                </div>
+            </div>
+
+            <!-- Faculty 4 Primary Action Tiles -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="/pbas/faculty/" class="p-4 bg-slate-800/80 hover:bg-blue-900/40 border border-slate-700 hover:border-blue-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+                        <span class="text-[10px] uppercase font-mono text-purple-400 font-bold">100 Marks</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-blue-300 transition">My PBAS Appraisal Form</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Self-evaluate 4 sections, upload proofs &amp; export PDF</p>
+                    </div>
+                    <span class="text-[11px] text-blue-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>Open Appraisal</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+
+                <a href="/leave/" class="p-4 bg-slate-800/80 hover:bg-purple-900/40 border border-slate-700 hover:border-purple-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <div class="text-[10px] font-mono text-slate-300 space-x-1">
+                            <span class="text-blue-300">CL:{{ current_employee.cl_available|floatformat:0 }}</span>
+                            <span class="text-purple-300">EL:{{ current_employee.el_available|floatformat:0 }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-purple-300 transition">My Leave Management</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Apply for leave, class substitution &amp; track approval</p>
+                    </div>
+                    <span class="text-[11px] text-purple-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>Apply &amp; Balances</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+
+                <a href="/salary/payslip/employee/{{ current_employee.employee_id }}/" class="p-4 bg-slate-800/80 hover:bg-emerald-900/40 border border-slate-700 hover:border-emerald-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-emerald-400 font-bold">₹92,566 Net</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-emerald-300 transition">My Monthly Pay Slip</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Basic pay, DA, HRA, PF &amp; official printable salary slip</p>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>View Pay Slip</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+
+                <a href="/onboarding-offboarding/employee/{{ current_employee.employee_id }}/" class="p-4 bg-slate-800/80 hover:bg-amber-900/40 border border-slate-700 hover:border-amber-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-id-card"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-amber-300 font-bold">Dossier</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-amber-300 transition">My Service Dossier</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">6-step onboarding checklist, verified certificates &amp; ID</p>
+                    </div>
+                    <span class="text-[11px] text-amber-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>View Profile</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+
+        {% elif active_role == 'HOD' %}
+        <div class="bg-gradient-to-r from-amber-950/70 via-slate-900 to-slate-900 rounded-3xl border-2 border-amber-500/40 p-6 sm:p-8 shadow-2xl shadow-amber-950/50 space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-amber-800/40">
+                <div class="space-y-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                            <i class="fa-solid fa-user-tie mr-1"></i> Head of Department (HoD) View
+                        </span>
+                        <span class="text-xs text-slate-400 font-mono">Department Review Authority</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-white">Welcome, <span class="text-amber-300">{{ user_name|default:"Dr. Kiran B. R." }}</span></h3>
+                    <p class="text-xs text-slate-300">Department of Computer Science &amp; Engineering · Appraisal &amp; Leave Approver</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="px-3 py-1 bg-amber-950/70 text-amber-300 border border-amber-600/50 rounded-xl text-xs font-bold font-mono">
+                        <i class="fa-solid fa-inbox text-amber-400 mr-1.5"></i>{{ pending_leaves }} Leave Actions Pending
+                    </span>
+                </div>
+            </div>
+
+            <!-- HoD 4 Department Action Tiles -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="/pbas/hod/" class="p-4 bg-slate-800/80 hover:bg-amber-900/40 border border-slate-700 hover:border-amber-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                        <span class="text-[10px] uppercase font-mono text-amber-400 font-bold">15 Marks</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-amber-300 transition">PBAS Faculty Evaluation</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Score department faculty, verify proofs &amp; forward to Principal</p>
+                    </div>
+                    <span class="text-[11px] text-amber-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>Evaluate Faculty</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+
+                <a href="/leave/" class="p-4 bg-slate-800/80 hover:bg-purple-900/40 border border-slate-700 hover:border-purple-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-inbox"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-purple-400 font-bold">{{ pending_leaves }} Pending</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-purple-300 transition">Leave Approval Queue</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Approve/reject leave requests &amp; review class arrangements</p>
+                    </div>
+                    <span class="text-[11px] text-purple-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>Open Queue</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+
+                <a href="/onboarding-offboarding/?department=Computer+Science+%26+Engineering" class="p-4 bg-slate-800/80 hover:bg-blue-900/40 border border-slate-700 hover:border-blue-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-blue-400 font-bold">Dept Staff</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-blue-300 transition">Dept Faculty Directory</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Department faculty profiles, onboarding status &amp; clearances</p>
+                    </div>
+                    <span class="text-[11px] text-blue-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>View Staff</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+
+                <a href="/salary/" class="p-4 bg-slate-800/80 hover:bg-emerald-900/40 border border-slate-700 hover:border-emerald-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-emerald-400 font-bold">Payroll Hub</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-emerald-300 transition">Salary &amp; LOP Calculator</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Simulate LOP deductions, verify 7th CPC structures &amp; slips</p>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>Open Payroll</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+
+        {% elif active_role == 'PRINCIPAL' %}
+        <div class="bg-gradient-to-r from-emerald-950/70 via-slate-900 to-slate-900 rounded-3xl border-2 border-emerald-500/40 p-6 sm:p-8 shadow-2xl shadow-emerald-950/50 space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-emerald-800/40">
+                <div class="space-y-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                            <i class="fa-solid fa-building-columns mr-1"></i> Principal / Institutional Authority View
+                        </span>
+                        <span class="text-xs text-slate-400 font-mono">Executive Governance Desk</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-white">Welcome, <span class="text-emerald-300">{{ user_name|default:"Dr. M. K. Venkatesha" }}</span></h3>
+                    <p class="text-xs text-slate-300">{{ active_inst }} · Final Approval Authority for Appraisals, Leaves &amp; Exits</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="px-3 py-1 bg-emerald-950/70 text-emerald-300 border border-emerald-600/50 rounded-xl text-xs font-bold font-mono">
+                        <i class="fa-solid fa-stamp text-emerald-400 mr-1.5"></i>Final Decision Desk
+                    </span>
+                </div>
+            </div>
+
+            <!-- Principal 4 Executive Action Tiles -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="/pbas/principal/" class="p-4 bg-slate-800/80 hover:bg-emerald-900/40 border border-slate-700 hover:border-emerald-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-stamp"></i>
+                        </div>
+                        <span class="text-[10px] uppercase font-mono text-purple-400 font-bold">5 Marks Final</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-emerald-300 transition">Principal PBAS Authorization</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Finalize grand score out of 100, award grade &amp; authorize increment</p>
+                    </div>
+                    <span class="text-[11px] text-emerald-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>Authorize Appraisals</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+
+                <a href="/leave/" class="p-4 bg-slate-800/80 hover:bg-blue-900/40 border border-slate-700 hover:border-blue-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-signature"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-blue-400 font-bold">Balance Deduction</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-blue-300 transition">Final Leave Sanction</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Principal approval deducts official leave balance &amp; alerts HR</p>
+                    </div>
+                    <span class="text-[11px] text-blue-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>Sanction Leaves</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+
+                <a href="/onboarding-offboarding/" class="p-4 bg-slate-800/80 hover:bg-amber-900/40 border border-slate-700 hover:border-amber-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-building-user"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-amber-400 font-bold">{{ total_faculty }} Faculty</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-amber-300 transition">Campus Faculty &amp; Exits</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Review 6 department exit clearances &amp; sign Relieving Letters</p>
+                    </div>
+                    <span class="text-[11px] text-amber-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>All Faculty Directory</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+
+                <a href="/salary/" class="p-4 bg-slate-800/80 hover:bg-rose-900/40 border border-slate-700 hover:border-rose-500 rounded-2xl transition space-y-2 group">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-400/30 flex items-center justify-center text-rose-300 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <span class="text-[10px] font-mono text-rose-400 font-bold">₹{{ total_payroll_val|floatformat:0 }}</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white group-hover:text-rose-300 transition">Total Institutional Payroll</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Monthly payroll disbursement overview &amp; increment approvals</p>
+                    </div>
+                    <span class="text-[11px] text-rose-400 font-semibold flex items-center space-x-1 pt-1">
+                        <span>Payroll Overview</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Section Header -->
+        <div class="text-center space-y-2">
+            <h3 class="text-xl sm:text-2xl font-black text-white">
+                Four Integrated HR Portals — <span class="text-amber-400">One Unified Platform</span>
+            </h3>
+            <p class="text-sm text-slate-400 max-w-2xl mx-auto">
+                Each portal is independently functional and cross-linked. Data flows automatically between modules —
+                approved leaves trigger LOP deductions in salary; PBAS appraisals inform increment recommendations.
+            </p>
+        </div>
+
+        <!-- 4 Portal Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+            <!-- PORTAL 1: Onboarding & Offboarding -->
+            <a href="/onboarding-offboarding/" class="portal-card group block bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden hover:border-blue-500/60 hover:shadow-2xl hover:shadow-blue-900/40">
+                <div class="bg-gradient-to-br from-blue-900 to-rnsit-dark p-6 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 text-2xl">
+                            <i class="fa-solid fa-users-gear"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-bold px-2 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-400/30 rounded-full">Portal 01</span>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-black text-white leading-tight">Onboarding &amp; Offboarding</h4>
+                        <p class="text-xs text-blue-200/70 mt-1">Entry-to-Exit Lifecycle</p>
+                    </div>
+                </div>
+                <div class="p-5 space-y-3">
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="p-2 bg-slate-700/50 rounded-lg border border-slate-600 text-center">
+                            <span class="font-mono font-black text-blue-400 text-lg block">{{ onboarding_faculty }}</span>
+                            <span class="text-slate-400 text-[11px]">In Onboarding</span>
+                        </div>
+                        <div class="p-2 bg-slate-700/50 rounded-lg border border-slate-600 text-center">
+                            <span class="font-mono font-black text-rose-400 text-lg block">{{ exit_faculty }}</span>
+                            <span class="text-slate-400 text-[11px]">Exited</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5 text-xs text-slate-400">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-blue-500 w-4 text-center"></i>
+                            <span>6-Step Onboarding Wizard</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-blue-500 w-4 text-center"></i>
+                            <span>8-Step Exit + 6 Clearances</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-blue-500 w-4 text-center"></i>
+                            <span>Auto Relieving &amp; Exp Certificate</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-blue-500 w-4 text-center"></i>
+                            <span>Auto Employee Code Generation</span>
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-slate-700 flex items-center justify-between text-xs">
+                        <span class="text-slate-500">Slides 8 &amp; 9</span>
+                        <span class="text-blue-400 font-semibold group-hover:underline flex items-center space-x-1">
+                            <span>Open Portal</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- PORTAL 2: Leave Management -->
+            <a href="/leave/" class="portal-card group block bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden hover:border-purple-500/60 hover:shadow-2xl hover:shadow-purple-900/40">
+                <div class="bg-gradient-to-br from-purple-900 to-slate-900 p-6 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 text-2xl">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-bold px-2 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-400/30 rounded-full">Portal 02</span>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-black text-white leading-tight">Leave Management</h4>
+                        <p class="text-xs text-purple-200/70 mt-1">Multi-Level Approval Workflow</p>
+                    </div>
+                </div>
+                <div class="p-5 space-y-3">
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="p-2 bg-slate-700/50 rounded-lg border border-slate-600 text-center">
+                            <span class="font-mono font-black text-amber-400 text-lg block">{{ pending_leaves }}</span>
+                            <span class="text-slate-400 text-[11px]">Pending Action</span>
+                        </div>
+                        <div class="p-2 bg-slate-700/50 rounded-lg border border-slate-600 text-center">
+                            <span class="font-mono font-black text-emerald-400 text-lg block">{{ total_approved_leaves }}</span>
+                            <span class="text-slate-400 text-[11px]">Approved</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5 text-xs text-slate-400">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-purple-500 w-4 text-center"></i>
+                            <span>CL / EL / ML / OD / LOP Types</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-purple-500 w-4 text-center"></i>
+                            <span>Faculty → HoD → Principal Chain</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-purple-500 w-4 text-center"></i>
+                            <span>Rejection Resubmit Enabled</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-link text-amber-500 w-4 text-center"></i>
+                            <span class="text-amber-400">Auto LOP → Salary Deduction Link</span>
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-slate-700 flex items-center justify-between text-xs">
+                        <span class="text-slate-500">Slides 4 &amp; 5</span>
+                        <span class="text-purple-400 font-semibold group-hover:underline flex items-center space-x-1">
+                            <span>Open Portal</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- PORTAL 3: Salary Calculator & Payslip -->
+            <a href="/salary/" class="portal-card group block bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden hover:border-emerald-500/60 hover:shadow-2xl hover:shadow-emerald-900/40">
+                <div class="bg-gradient-to-br from-emerald-900 to-slate-900 p-6 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 text-2xl">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-bold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded-full">Portal 03</span>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-black text-white leading-tight">Salary Calculator &amp; Pay Slip</h4>
+                        <p class="text-xs text-emerald-200/70 mt-1">Monthly Payroll Engine</p>
+                    </div>
+                </div>
+                <div class="p-5 space-y-3">
+                    <div class="p-2.5 bg-emerald-900/30 rounded-lg border border-emerald-500/20 text-center text-xs space-y-0.5">
+                        <span class="text-[10px] text-emerald-400 uppercase font-bold tracking-wider block">November 2026 Net Payroll</span>
+                        <span class="font-mono font-black text-emerald-300 text-xl">₹{{ total_payroll_val|floatformat:0 }}</span>
+                    </div>
+                    <div class="space-y-1.5 text-xs text-slate-400">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-emerald-500 w-4 text-center"></i>
+                            <span>Basic + DA(50%) + HRA(20%) + TA</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-emerald-500 w-4 text-center"></i>
+                            <span>PF, PT, TDS Statutory Deductions</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-emerald-500 w-4 text-center"></i>
+                            <span>Live Interactive Calculator Sandbox</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-emerald-500 w-4 text-center"></i>
+                            <span>Printable RNSIT Official Pay Slip</span>
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-slate-700 flex items-center justify-between text-xs">
+                        <span class="text-slate-500">Slides 6 &amp; 7</span>
+                        <span class="text-emerald-400 font-semibold group-hover:underline flex items-center space-x-1">
+                            <span>Open Portal</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- PORTAL 4: PBAS Appraisal -->
+            <a href="/pbas/" class="portal-card group block bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-900/40">
+                <div class="bg-gradient-to-br from-amber-900 to-slate-900 p-6 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 text-2xl">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <span class="text-[10px] font-mono font-bold px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full">Portal 04</span>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-black text-white leading-tight">PBAS Appraisal System</h4>
+                        <p class="text-xs text-amber-200/70 mt-1">Performance Based Appraisal · 100 Mark Scale</p>
+                    </div>
+                </div>
+                <div class="p-5 space-y-3">
+                    <div class="grid grid-cols-3 gap-1.5 text-xs text-center">
+                        <div class="p-2 bg-slate-700/50 rounded-lg border border-slate-600">
+                            <span class="font-mono font-bold text-blue-400 text-sm block">70</span>
+                            <span class="text-slate-500 text-[10px]">Sec I TLP</span>
+                        </div>
+                        <div class="p-2 bg-slate-700/50 rounded-lg border border-slate-600">
+                            <span class="font-mono font-bold text-purple-400 text-sm block">40</span>
+                            <span class="text-slate-500 text-[10px]">Sec II R&amp;D</span>
+                        </div>
+                        <div class="p-2 bg-slate-700/50 rounded-lg border border-slate-600">
+                            <span class="font-mono font-bold text-emerald-400 text-sm block">20</span>
+                            <span class="text-slate-500 text-[10px]">Sec III Prof</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5 text-xs text-slate-400">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-amber-500 w-4 text-center"></i>
+                            <span>130→80 Scaled Score Formula</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-amber-500 w-4 text-center"></i>
+                            <span>HOD (15) + Principal (5) Review</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check-circle text-amber-500 w-4 text-center"></i>
+                            <span>Evidence Upload + PDF Export</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-link text-amber-500 w-4 text-center"></i>
+                            <span class="text-amber-400">Grade → Increment Recommendation</span>
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-slate-700 flex items-center justify-between text-xs">
+                        <span class="text-slate-500">{{ pbas_submissions_count }} Submissions</span>
+                        <span class="text-amber-400 font-semibold group-hover:underline flex items-center space-x-1">
+                            <span>Open Portal</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </span>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- INTEGRATION DATA FLOW DIAGRAM                         -->
+        <!-- ===================================================== -->
+        <div class="bg-slate-800/60 rounded-2xl border border-slate-700 p-6 sm:p-8 space-y-5">
+            <div class="text-center space-y-1">
+                <h4 class="text-sm font-bold text-white uppercase tracking-wider flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-diagram-project text-amber-400"></i>
+                    <span>Unified Cross-Portal Data Flow & Integration Architecture</span>
+                </h4>
+                <p class="text-xs text-slate-400">All 4 portals share the same Employee Master DB and exchange live data bidirectionally</p>
+            </div>
+
+            <!-- Visual Data Flow (4 portals with arrows) -->
+            <div class="flex flex-wrap items-center justify-center gap-3 text-xs">
+
+                <div class="flex flex-col items-center space-y-1.5 p-4 bg-blue-900/40 border border-blue-700/50 rounded-xl min-w-[130px]">
+                    <i class="fa-solid fa-users-gear text-blue-400 text-xl"></i>
+                    <span class="font-bold text-blue-300">P1: Onboarding</span>
+                    <span class="text-[10px] text-slate-500 text-center">Employee Master<br/>+ Role Assignment</span>
+                </div>
+
+                <div class="flex flex-col items-center text-slate-500 space-y-1 text-[10px] font-mono">
+                    <i class="fa-solid fa-right-long text-blue-500/50 text-lg"></i>
+                    <span>emp_id</span>
+                    <span>basic_pay</span>
+                    <span>leave_quota</span>
+                </div>
+
+                <div class="flex flex-col items-center space-y-1.5 p-4 bg-purple-900/40 border border-purple-700/50 rounded-xl min-w-[130px]">
+                    <i class="fa-solid fa-calendar-days text-purple-400 text-xl"></i>
+                    <span class="font-bold text-purple-300">P2: Leave</span>
+                    <span class="text-[10px] text-slate-500 text-center">CL/EL/ML/LOP<br/>Approval Chain</span>
+                </div>
+
+                <div class="flex flex-col items-center text-slate-500 space-y-1 text-[10px] font-mono">
+                    <i class="fa-solid fa-right-long text-emerald-500/50 text-lg"></i>
+                    <span>lop_days</span>
+                    <span class="text-amber-400">→ deduction</span>
+                </div>
+
+                <div class="flex flex-col items-center space-y-1.5 p-4 bg-emerald-900/40 border border-emerald-700/50 rounded-xl min-w-[130px]">
+                    <i class="fa-solid fa-wallet text-emerald-400 text-xl"></i>
+                    <span class="font-bold text-emerald-300">P3: Salary</span>
+                    <span class="text-[10px] text-slate-500 text-center">Gross − LOP<br/>Net Pay + Slip</span>
+                </div>
+
+                <div class="flex flex-col items-center text-slate-500 space-y-1 text-[10px] font-mono">
+                    <i class="fa-solid fa-right-long text-amber-500/50 text-lg"></i>
+                    <span>grade</span>
+                    <span class="text-amber-400">→ increment</span>
+                </div>
+
+                <div class="flex flex-col items-center space-y-1.5 p-4 bg-amber-900/40 border border-amber-700/50 rounded-xl min-w-[130px]">
+                    <i class="fa-solid fa-trophy text-amber-400 text-xl"></i>
+                    <span class="font-bold text-amber-300">P4: PBAS</span>
+                    <span class="text-[10px] text-slate-500 text-center">100-Mark Score<br/>Performance Grade</span>
+                </div>
+
+                <!-- Feedback arrow back -->
+                <div class="w-full flex justify-center mt-1">
+                    <div class="flex items-center space-x-2 text-[11px] text-slate-500 font-mono bg-slate-700/40 px-4 py-2 rounded-lg border border-slate-600">
+                        <i class="fa-solid fa-rotate text-amber-400"></i>
+                        <span>PBAS Performance Grade → Salary Increment Recommendation → Back to HR Records (P1 Employee Master)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- QUICK ACCESS TILES: ROLE-SPECIFIC SHORTCUTS           -->
+        <!-- ===================================================== -->
+        <div class="space-y-4">
+            <h4 class="text-sm font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                <i class="fa-solid fa-bolt text-amber-400"></i>
+                <span>Quick Access — Frequently Used Workflows</span>
+            </h4>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs text-center">
+
+                <a href="/onboarding-offboarding/" class="p-4 bg-slate-800 hover:bg-blue-900/40 border border-slate-700 hover:border-blue-600 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-user-plus text-blue-400 text-xl block"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">Enroll New Faculty</span>
+                    <span class="text-[10px] text-slate-500">6-Step Onboarding</span>
+                </a>
+
+                <a href="/onboarding-offboarding/?status=ONBOARDING" class="p-4 bg-slate-800 hover:bg-amber-900/40 border border-slate-700 hover:border-amber-600 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-spinner text-amber-400 text-xl block pulse-soft"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">In-Onboarding Checklist</span>
+                    <span class="text-[10px] text-slate-500">HR Document Audit</span>
+                </a>
+
+                <a href="/leave/" class="p-4 bg-slate-800 hover:bg-purple-900/40 border border-slate-700 hover:border-purple-600 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-paper-plane text-purple-400 text-xl block"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">Apply for Leave</span>
+                    <span class="text-[10px] text-slate-500">Faculty Self-Service</span>
+                </a>
+
+                <a href="/leave/" class="p-4 bg-slate-800 hover:bg-rose-900/40 border border-slate-700 hover:border-rose-600 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-inbox text-rose-400 text-xl block"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">Leave Approval Inbox</span>
+                    <span class="text-[10px] text-slate-500">HoD / Principal Queue</span>
+                </a>
+
+                <a href="/salary/" class="p-4 bg-slate-800 hover:bg-emerald-900/40 border border-slate-700 hover:border-emerald-600 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-receipt text-emerald-400 text-xl block"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">Download Pay Slip</span>
+                    <span class="text-[10px] text-slate-500">November 2026</span>
+                </a>
+
+                <a href="/salary/payslip/employee/{{ current_employee.employee_id }}/" class="p-4 bg-slate-800 hover:bg-teal-900/40 border border-slate-700 hover:border-teal-600 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-file-invoice-dollar text-teal-400 text-xl block"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">My Current Pay Slip</span>
+                    <span class="text-[10px] text-slate-500 font-mono">{{ current_employee.employee_id }}</span>
+                </a>
+
+                <a href="/onboarding-offboarding/?status=RELIEVED" class="p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-500 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-door-open text-slate-400 text-xl block"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">Exit Records</span>
+                    <span class="text-[10px] text-slate-500">Relieved Faculty</span>
+                </a>
+
+                <a href="/pbas/faculty/" class="p-4 bg-slate-800 hover:bg-amber-900/40 border border-slate-700 hover:border-amber-600 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-award text-amber-400 text-xl block"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">PBAS Self-Appraisal</span>
+                    <span class="text-[10px] text-slate-500">Faculty Portal</span>
+                </a>
+
+                <a href="/pbas/hod/" class="p-4 bg-slate-800 hover:bg-blue-900/40 border border-slate-700 hover:border-blue-600 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-clipboard-check text-blue-400 text-xl block"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">PBAS HoD Review</span>
+                    <span class="text-[10px] text-slate-500">HoD Scoring (15 Marks)</span>
+                </a>
+
+                <a href="/pbas/principal/" class="p-4 bg-slate-800 hover:bg-purple-900/40 border border-slate-700 hover:border-purple-600 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-stamp text-purple-400 text-xl block"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">PBAS Principal Review</span>
+                    <span class="text-[10px] text-slate-500">Principal Scoring (5 Marks)</span>
+                </a>
+
+                <a href="/onboarding-offboarding/document/relieving/RNSIT-EC-0899/" target="_blank" class="p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-500 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-file-contract text-slate-400 text-xl block"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">Sample Relieving Letter</span>
+                    <span class="text-[10px] text-slate-500">Official Print View</span>
+                </a>
+
+                <a href="/onboarding-offboarding/document/experience/RNSIT-EC-0899/" target="_blank" class="p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-500 rounded-xl transition space-y-2">
+                    <i class="fa-solid fa-scroll text-slate-400 text-xl block"></i>
+                    <span class="font-semibold text-slate-300 block leading-tight">Sample Exp Certificate</span>
+                    <span class="text-[10px] text-slate-500">Official Print View</span>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- FACULTY MASTER QUICK-VIEW TABLE                       -->
+        <!-- ===================================================== -->
+        <div class="bg-slate-800/60 rounded-2xl border border-slate-700 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-700 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h4 class="text-sm font-bold text-white">Faculty Master Snapshot</h4>
+                    <p class="text-xs text-slate-400">Live cross-portal record linking Employee → Leave Balance → Salary → PBAS</p>
+                </div>
+                <a href="/onboarding-offboarding/" class="text-xs font-semibold text-blue-400 hover:underline flex items-center space-x-1">
+                    <span>Full Directory</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left">
+                    <thead class="bg-slate-900/60 text-slate-500 uppercase text-[10px] font-semibold tracking-wider border-b border-slate-700">
+                        <tr>
+                            <th class="p-3 pl-6">Faculty & ID</th>
+                            <th class="p-3">Department</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3">Leave Balances (CL/EL/ML)</th>
+                            <th class="p-3">Monthly Net Pay</th>
+                            <th class="p-3 pr-6">Quick Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/50">
+                        {% for row in employee_rows %}
+                        {% with row.emp as emp %}
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="p-3 pl-6">
+                                <div class="font-bold text-white">{{ emp.full_name }}</div>
+                                <span class="font-mono text-[10px] text-slate-500">{{ emp.employee_id }}</span>
+                            </td>
+                            <td class="p-3 text-slate-300">{{ emp.department }}</td>
+                            <td class="p-3">
+                                {% if emp.status == 'ACTIVE' %}
+                                <span class="px-2 py-0.5 bg-emerald-900/50 text-emerald-400 border border-emerald-700/50 rounded-full text-[10px] font-bold">Active</span>
+                                {% elif emp.status == 'ONBOARDING' %}
+                                <span class="px-2 py-0.5 bg-blue-900/50 text-blue-400 border border-blue-700/50 rounded-full text-[10px] font-bold">Onboarding</span>
+                                {% else %}
+                                <span class="px-2 py-0.5 bg-slate-700 text-slate-400 border border-slate-600 rounded-full text-[10px] font-bold">{{ emp.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3 font-mono text-[11px]">
+                                <span class="px-1.5 py-0.5 bg-blue-900/50 text-blue-300 rounded mr-1">CL:{{ emp.cl_available|floatformat:0 }}</span>
+                                <span class="px-1.5 py-0.5 bg-purple-900/50 text-purple-300 rounded mr-1">EL:{{ emp.el_available|floatformat:0 }}</span>
+                                <span class="px-1.5 py-0.5 bg-rose-900/50 text-rose-300 rounded">ML:{{ emp.ml_available|floatformat:0 }}</span>
+                            </td>
+                            <td class="p-3 font-mono font-bold text-emerald-400">
+                                ₹{{ row.net_salary|floatformat:0 }}
+                                <span class="text-slate-500 font-normal text-[10px] block">{% if row.has_slip %}net pay{% else %}basic pay{% endif %}</span>
+                            </td>
+                            <td class="p-3 pr-6">
+                                <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                                    <a href="/onboarding-offboarding/employee/{{ emp.employee_id }}/" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-[11px] font-semibold transition">Profile</a>
+                                    <a href="/leave/" class="px-2 py-1 bg-purple-900/50 hover:bg-purple-800 text-purple-300 rounded text-[11px] font-semibold transition">Leave</a>
+                                    <a href="/salary/payslip/employee/{{ emp.employee_id }}/" class="px-2 py-1 bg-emerald-900/50 hover:bg-emerald-800 text-emerald-300 rounded text-[11px] font-semibold transition">Pay Slip</a>
+                                    <a href="/pbas/faculty/" class="px-2 py-1 bg-amber-900/50 hover:bg-amber-800 text-amber-300 rounded text-[11px] font-semibold transition">PBAS</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endwith %}
+                        {% empty %}
+                        <tr><td colspan="6" class="p-6 text-center text-slate-500">No employee records found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-6 py-3 border-t border-slate-700 text-center text-xs text-slate-500">
+                Showing <strong class="text-slate-300">{{ employee_rows|length }}</strong> active/onboarding faculty. <a href="/onboarding-offboarding/" class="text-blue-400 hover:underline font-semibold">View all {{ total_faculty }} records →</a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 mt-10 py-6 text-center text-xs text-slate-600">
+        <div class="max-w-screen-2xl mx-auto px-6">
+            <p><strong class="text-slate-400">RNS HR System E2E</strong> · Built by <strong class="text-amber-400">TechTrinity</strong> for RNSIT Faculty Hackathon 2026</p>
+            <p class="mt-1 font-mono text-[10px]">Dr. Uma S V · Dr. Leena Chandrashekar · Dr. Shruthi U · Dr. Swathi Darla · Ms. Ganga M S · Mr. Vyasaraj T</p>
+        </div>
+    </footer>
+
+    <script>
+        async function quickSwitch(type, value) {
+            try {
+                const payload = {};
+                payload[type] = value;
+                const res = await fetch('/api/quick-switch/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    // Show brief toast then reload
+                    showToast(`Switched ${type} to: ${value}`);
+                    setTimeout(() => location.reload(), 600);
+                }
+            } catch (err) {
+                console.error('Quick switch error:', err);
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 right-6 bg-slate-800 border border-amber-500/50 text-amber-300 font-semibold text-xs px-4 py-2.5 rounded-xl shadow-2xl z-[9999] transition';
+            toast.innerHTML = `<i class="fa-solid fa-check-circle text-amber-400 mr-2"></i>${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+    </script>
+
+</body>
+</html>
